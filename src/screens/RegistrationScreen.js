@@ -8,6 +8,7 @@ import Error from '../components/Error';
 import AuthContainer from '../components/AuthContainer';
 import AuthContext from '../contexts/AuthContext';
 import EnhancedPicker from '../components/EnhancedPicker';
+import Loading from '../components/Loading';
 import { SiteRoles } from '../config/SiteRolesConfig';
 
 const styles = StyleSheet.create({
@@ -38,6 +39,8 @@ const RegistrationScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [siteRole, setSiteRole] = useState('0');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     function cancelIconPressHandler() {
         navigation.pop();
@@ -67,6 +70,28 @@ const RegistrationScreen = ({ navigation }) => {
         return pickerOptions;
     }
 
+    async function handleRegisterPress() {
+        console.log('Register was pressed.');
+        try {
+            setLoading(true);
+            const response = await register(
+                siteRole,
+                firstName,
+                lastName,
+                email,
+                phone,
+                username,
+                password
+            );
+            console.log('Response data was: ', response.data);
+            navigation.pop();
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+        setLoading(false);
+    }
+
     return (
         <ScrollView>
             <AuthContainer>
@@ -77,7 +102,7 @@ const RegistrationScreen = ({ navigation }) => {
                     onPress={cancelIconPressHandler}
                 />
                 <Heading>Sign up!</Heading>
-                <Error errorMessage={''} />
+                <Error errorMessage={error} />
                 <FormInput
                     style={styles.input}
                     placeholder={'First name'}
@@ -125,18 +150,9 @@ const RegistrationScreen = ({ navigation }) => {
                 <StyledButton
                     title={'Sign up'}
                     style={styles.registrationButton}
-                    onPress={() =>
-                        register(
-                            siteRole,
-                            firstName,
-                            lastName,
-                            username,
-                            email,
-                            phone,
-                            password
-                        )
-                    }
+                    onPress={handleRegisterPress}
                 />
+                <Loading loading={loading} />
             </AuthContainer>
         </ScrollView>
     );

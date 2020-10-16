@@ -8,6 +8,7 @@ import Error from '../components/Error';
 import AuthContainer from '../components/AuthContainer';
 import { navigationRoutes } from '../config/NavConfig';
 import AuthContext from '../contexts/AuthContext';
+import Loading from '../components/Loading';
 
 const styles = StyleSheet.create({
     container: {
@@ -24,14 +25,29 @@ const styles = StyleSheet.create({
 });
 
 const LoginScreen = ({ navigation }) => {
+    const { login } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const { login } = useContext(AuthContext);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    async function handleLoginPress() {
+        try {
+            setLoading(true);
+            const response = await login(username, password);
+            console.log('Response data: ', response.data);
+        } catch (e) {
+            console.error(e);
+            setError(e.message);
+        }
+        setLoading(false);
+    }
+
     return (
         <AuthContainer>
             <Heading>Login!</Heading>
-            <Error errorMessage={''} />
+            <Error errorMessage={error} />
             <FormInput
                 style={styles.input}
                 placeholder={'Username'}
@@ -48,7 +64,7 @@ const LoginScreen = ({ navigation }) => {
             <StyledButton
                 title={'Login'}
                 style={styles.loginButton}
-                onPress={() => login(username, password)}
+                onPress={handleLoginPress}
             />
             <TextButton
                 title={"Don't have an account? Create one here!"}
@@ -57,6 +73,7 @@ const LoginScreen = ({ navigation }) => {
                     navigation.navigate(navigationRoutes.REGISTRATION)
                 }
             />
+            <Loading loading={loading} />
         </AuthContainer>
     );
 };
