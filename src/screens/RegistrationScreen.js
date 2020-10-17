@@ -47,7 +47,6 @@ const RegistrationScreen = ({ navigation }) => {
     }
 
     function handleSiteRoleChange(val) {
-        console.log(val);
         if (val !== 0) {
             setSiteRole(val);
         }

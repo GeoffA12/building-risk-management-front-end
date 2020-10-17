@@ -5,4 +5,5 @@ export const navigationRoutes = {
     REGISTRATION: 'Registration',
     LOGIN: 'Login',
     USERLIST: 'UserList',
+    SPLASHSCREEN: 'SplashScreen',
 };
