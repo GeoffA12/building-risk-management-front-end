@@ -8,6 +8,7 @@ import MainStackNavigator from './navigators/MainStackNavigator';
 import AuthContext from './contexts/AuthContext';
 import UserContext from './contexts/UserContext';
 import { BASE_URL_GEOFF_LOCAL } from './config/APIConfig';
+import { BASE_URL_DROPLET } from './config/APIConfig';
 import { createAction } from './config/CreateAction';
 
 const RootStack = createStackNavigator();
@@ -32,13 +33,11 @@ const App = () => {
     const auth = useMemo(
         () => ({
             login: async (username, password) => {
-                console.log('Login API received: ', username, password);
-                const url = `${BASE_URL_GEOFF_LOCAL}/authenticateUserLogin`;
+                const url = `${BASE_URL_DROPLET}/authenticateUserLogin`;
                 const response = await axios.post(url, {
                     username,
                     hashPassword: password,
                 });
-                console.log(response);
                 const { data } = response;
                 if (data) {
                     const user = {
@@ -65,7 +64,7 @@ const App = () => {
                 username,
                 password
             ) => {
-                const url = `${BASE_URL_GEOFF_LOCAL}/createUser`;
+                const url = `${BASE_URL_DROPLET}/createUser`;
                 const response = await axios.post(url, {
                     siteRole,
                     firstName,

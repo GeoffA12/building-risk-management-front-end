@@ -71,7 +71,6 @@ const RegistrationScreen = ({ navigation }) => {
     }
 
     async function handleRegisterPress() {
-        console.log('Register was pressed.');
         try {
             setLoading(true);
             const response = await register(
@@ -83,7 +82,6 @@ const RegistrationScreen = ({ navigation }) => {
                 username,
                 password
             );
-            console.log('Response data was: ', response.data);
             navigation.pop();
         } catch (e) {
             console.error(e);
