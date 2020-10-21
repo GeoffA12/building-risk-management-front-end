@@ -2,7 +2,7 @@ import { useReducer, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import SecureStorage from 'react-native-secure-storage';
 import { createAction } from '../utils/CreateAction';
-import { BASE_URL_DROPLET } from '../config/APIConfig';
+import { BASE_URL_GEOFF_LOCAL } from '../config/APIConfig';
 
 export const useAuth = () => {
     const userKey = 'user';
@@ -37,7 +37,7 @@ export const useAuth = () => {
     const auth = useMemo(
         () => ({
             login: async (username, password) => {
-                const url = `${BASE_URL_DROPLET}/authenticateUserLogin`;
+                const url = `${BASE_URL_GEOFF_LOCAL}/authenticateUserLogin`;
                 const response = await axios.post(url, {
                     username,
                     hashPassword: password,
@@ -45,12 +45,14 @@ export const useAuth = () => {
                 const { data } = response;
                 if (data) {
                     const user = {
+                        id: data.id,
                         firstName: data.firstName,
                         lastName: data.lastName,
                         username: data.username,
                         phone: data.phone,
                         email: data.email,
                         authToken: data.authToken,
+                        associatedSiteIds: data.associatedSiteIds,
                     };
                     await SecureStorage.setItem(userKey, JSON.stringify(user));
                     dispatch(createAction('SET_USER', user));
@@ -68,9 +70,10 @@ export const useAuth = () => {
                 email,
                 phone,
                 username,
-                password
+                password,
+                siteId
             ) => {
-                const url = `${BASE_URL_DROPLET}/createUser`;
+                const url = `${BASE_URL_GEOFF_LOCAL}/createUser`;
                 const response = await axios.post(url, {
                     siteRole,
                     firstName,
@@ -79,6 +82,7 @@ export const useAuth = () => {
                     email,
                     phone,
                     password,
+                    siteId,
                 });
                 return response;
             },

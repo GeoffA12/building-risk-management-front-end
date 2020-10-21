@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
+import axios from 'axios';
 import Heading from '../components/Heading';
 import FormInput from '../components/FormInput';
 import StyledButton from '../components/StyledButton';
@@ -10,6 +11,7 @@ import AuthContext from '../contexts/AuthContext';
 import EnhancedPicker from '../components/EnhancedPicker';
 import Loading from '../components/Loading';
 import { SiteRoles } from '../config/SiteRolesConfig';
+import { BASE_URL_GEOFF_LOCAL } from '../config/APIConfig';
 
 const styles = StyleSheet.create({
     container: {
@@ -38,9 +40,28 @@ const RegistrationScreen = ({ navigation }) => {
     const [phone, setPhone] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [siteRole, setSiteRole] = useState('0');
+    const [selectedSiteRole, setSelectedSiteRole] = useState('0');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [sites, setSites] = useState([]);
+    const [selectedSite, setSelectedSite] = useState('0');
+
+    useEffect(() => {
+        loadAllSites();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    async function loadAllSites() {
+        let allSites;
+        setLoading(true);
+        try {
+            allSites = await axios.get(`${BASE_URL_GEOFF_LOCAL}/getAllSites`);
+        } catch (e) {
+            console.error(e);
+        }
+        setLoading(false);
+        setSites(allSites.data);
+    }
 
     function cancelIconPressHandler() {
         navigation.pop();
@@ -48,15 +69,40 @@ const RegistrationScreen = ({ navigation }) => {
 
     function handleSiteRoleChange(val) {
         if (val !== 0) {
-            setSiteRole(val);
+            setSelectedSiteRole(val);
         }
     }
 
-    function setPickerOptions() {
+    function handleSiteChange(val) {
+        if (val !== 0) {
+            setSelectedSite(val);
+        }
+    }
+
+    console.log(selectedSite);
+    console.log(selectedSiteRole);
+
+    function setSitePickerOptions() {
+        let siteOptions = [];
+        siteOptions.push({
+            label: 'Select your site',
+            value: '0',
+        });
+        const sitesCopy = sites.map((site) => ({ ...site }));
+        for (let x = 0; x < sitesCopy.length; ++x) {
+            let currentSite = sitesCopy[x];
+            currentSite.label = currentSite.siteName;
+            currentSite.value = currentSite.id;
+            siteOptions.push(currentSite);
+        }
+        return siteOptions;
+    }
+
+    function setSiteRolePickerOptions() {
         const siteRoles = Object.keys(SiteRoles);
         let pickerOptions = [];
         pickerOptions.push({
-            label: 'Please select your site role',
+            label: 'Select your site role',
             value: '0',
         });
         for (let x = 0; x < siteRoles.length; ++x) {
@@ -73,13 +119,14 @@ const RegistrationScreen = ({ navigation }) => {
         try {
             setLoading(true);
             const response = await register(
-                siteRole,
+                selectedSiteRole,
                 firstName,
                 lastName,
                 email,
                 phone,
                 username,
-                password
+                password,
+                selectedSite
             );
             navigation.pop();
         } catch (e) {
@@ -141,9 +188,19 @@ const RegistrationScreen = ({ navigation }) => {
                 />
                 <EnhancedPicker
                     onChange={handleSiteRoleChange}
-                    currentRoleSelected={siteRole}
-                    pickerOptions={setPickerOptions()}
+                    currentRoleSelected={selectedSiteRole}
+                    pickerOptions={setSiteRolePickerOptions()}
+                    prompt={'Select your site role'}
                 />
+                {sites ? (
+                    <EnhancedPicker
+                        onChange={handleSiteChange}
+                        currentRoleSelected={selectedSite}
+                        pickerOptions={setSitePickerOptions()}
+                        prompt={'Select your site'}
+                    />
+                ) : null}
+
                 <StyledButton
                     title={'Sign up'}
                     style={styles.registrationButton}

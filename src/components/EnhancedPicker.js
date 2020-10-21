@@ -19,14 +19,19 @@ const styles = StyleSheet.create({
     },
 });
 
-const EnhancedPicker = ({ onChange, currentRoleSelected, pickerOptions }) => {
+const EnhancedPicker = ({
+    onChange,
+    currentRoleSelected,
+    pickerOptions,
+    prompt,
+}) => {
     return (
         <View style={styles.container}>
             <Picker
                 style={styles.picker}
                 onValueChange={onChange}
                 selectedValue={currentRoleSelected}
-                prompt={'Select a site role'}>
+                prompt={prompt}>
                 {pickerOptions.map((option) => {
                     return (
                         <Picker.Item
