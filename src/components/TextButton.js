@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { DARK_BLUE } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     container: {
@@ -10,7 +11,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     text: {
-        color: '#026cb8',
+        color: `${DARK_BLUE}`,
         fontSize: 14,
         fontWeight: '400',
     },

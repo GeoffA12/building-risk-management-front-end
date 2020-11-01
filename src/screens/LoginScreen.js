@@ -25,7 +25,9 @@ const styles = StyleSheet.create({
 });
 
 const LoginScreen = ({ navigation }) => {
-    const { login } = useContext(AuthContext);
+    const {
+        auth: { login },
+    } = useContext(AuthContext);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -35,13 +37,12 @@ const LoginScreen = ({ navigation }) => {
     async function handleLoginPress() {
         try {
             setLoading(true);
-            const response = await login(username, password);
-            console.log('Response data: ', response.data);
+            await login(username, password);
         } catch (e) {
             console.error(e);
             setError(e.message);
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     return (

@@ -1,10 +1,11 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-ionicons';
+import { DARK_BLUE } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     closeButton: {
-        color: '#026cb8',
+        color: `${DARK_BLUE}`,
     },
     container: {},
 });

@@ -1,16 +1,17 @@
 import React from 'react';
 import { StyleSheet, TextInput } from 'react-native';
+import { LIGHT_TEAL } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     input: {
-        backgroundColor: '#45cff5',
+        backgroundColor: `${LIGHT_TEAL}`,
         width: '90%',
         padding: 15,
         borderRadius: 10,
     },
 });
 
-const FormInput = ({ children, style, ...props }) => {
+const FormInput = ({ style, ...props }) => {
     return <TextInput {...props} style={[styles.input, style]} />;
 };
 

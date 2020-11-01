@@ -4,19 +4,19 @@ import IconButton from './IconButton';
 
 const styles = StyleSheet.create({
     container: {
-        marginRight: 8,
+        marginRight: 25,
     },
 });
 
-const HeaderLogoutButton = ({ name, onPress }) => {
+const HeaderButton = ({ name, onPress, style }) => {
     return (
         <IconButton
             name={name}
-            style={styles.container}
+            style={[styles.container, style]}
             onPress={onPress}
             iconSize={32}
         />
     );
 };
 
-export default HeaderLogoutButton;
+export default HeaderButton;

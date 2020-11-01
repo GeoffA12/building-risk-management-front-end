@@ -5,17 +5,21 @@ export const SiteRoles = {
     SITEADMIN: {
         textField: 'Site Admin',
         apiEnumValue: 'SITEADMIN',
+        urlValue: 'SiteAdmin',
     },
     SITEMAINTENANCEMGR: {
         textField: 'Site Maintenance Manager',
-        apiEnumValue: 'SITEMAINTENANCEMANAGER',
+        apiEnumValue: 'SITEMAINTENANCEMGR',
+        urlValue: 'SiteMaintenanceManager',
     },
     SITEMAINTENANCEASSC: {
         textField: 'Site Maintenance Associate',
         apiEnumValue: 'SITEMAINTENANCEASSC',
+        urlValue: 'SiteMaintenanceAssociate',
     },
     WHSMEMBER: {
         textField: 'Workplace, Health, and Safety Staff',
         apiEnumValue: 'WHSMEMBER',
+        urlValue: 'WorkplaceHealthSafetyMember',
     },
 };

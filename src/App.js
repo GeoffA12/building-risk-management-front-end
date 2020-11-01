@@ -16,7 +16,7 @@ const App = () => {
     const { auth, state } = useAuth();
 
     function renderScreens() {
-        if (state && state.loading) {
+        if (state.loading) {
             return (
                 <RootStack.Screen
                     name={navigationRoutes.SPLASHSCREEN}
@@ -24,12 +24,12 @@ const App = () => {
                 />
             );
         } else {
-            return state && state.user ? (
+            return state.user ? (
                 <RootStack.Screen name={'MainStack'}>
                     {() => (
-                        <UserContext.Provider value={{ user: state.user }}>
-                            <MainStackNavigator />
-                        </UserContext.Provider>
+                        // <UserContext.Provider>
+                        <MainStackNavigator />
+                        // </UserContext.Provider>
                     )}
                 </RootStack.Screen>
             ) : (
@@ -42,7 +42,7 @@ const App = () => {
     }
 
     return (
-        <AuthContext.Provider value={auth}>
+        <AuthContext.Provider value={{ auth, user: state.user }}>
             <NavigationContainer>
                 <RootStack.Navigator
                     screenOptions={{
