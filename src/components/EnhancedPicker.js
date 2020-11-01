@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Picker } from '@react-native-community/picker';
+import { LIGHT_TEAL, DARK_BLUE } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     container: {
@@ -9,24 +10,30 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 10,
         borderRadius: 10,
-        backgroundColor: '#45cff5',
+        backgroundColor: `${LIGHT_TEAL}`,
     },
     picker: {
-        color: '#026cb8',
+        color: `${DARK_BLUE}`,
         height: 55,
         width: 305,
         padding: 20,
     },
 });
 
-const EnhancedPicker = ({ onChange, currentRoleSelected, pickerOptions }) => {
+const EnhancedPicker = ({
+    onChange,
+    currentRoleSelected,
+    pickerOptions,
+    prompt,
+    style,
+}) => {
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, style]}>
             <Picker
-                style={styles.picker}
+                style={[styles.picker, style]}
                 onValueChange={onChange}
                 selectedValue={currentRoleSelected}
-                prompt={'Select a site role'}>
+                prompt={prompt}>
                 {pickerOptions.map((option) => {
                     return (
                         <Picker.Item
