@@ -4,21 +4,21 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { navigationRoutes } from '../config/NavConfig';
 import UserListScreen from '../screens/UserListScreen';
 
-const MainStack = createStackNavigator();
+const SiteAdminStack = createStackNavigator();
 
-const MainStackNavigator = () => {
+const SiteAdminStackNavigator = () => {
     return (
-        <MainStack.Navigator mode={'modal'}>
-            <MainStack.Screen
-                name={navigationRoutes.USERLIST}
+        <SiteAdminStack.Navigator mode={'modal'}>
+            <SiteAdminStack.Screen
+                name={navigationRoutes.SITEADMINLIST}
                 component={UserListScreen}
                 options={{
                     title: 'User List',
                     headerTitleAlign: 'center',
                 }}
             />
-        </MainStack.Navigator>
+        </SiteAdminStack.Navigator>
     );
 };
 
-export default MainStackNavigator;
+export default SiteAdminStackNavigator;

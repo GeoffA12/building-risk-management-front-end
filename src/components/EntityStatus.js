@@ -3,10 +3,16 @@ import { Text, View, StyleSheet } from 'react-native';
 import axios from 'axios';
 import Loading from '../components/Loading';
 import Error from '../components/Error';
+import { convertUTCDateToLocalDate } from '../utils/Time';
 import { DARK_BLUE, LIGHT_TEAL } from '../styles/Colors';
 import { BASE_URL } from '../config/APIConfig';
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     entityStatusContainer: {
         backgroundColor: `${DARK_BLUE}`,
         margin: 2,
@@ -56,21 +62,26 @@ const EntityStatus = ({ entityName, publisherId, updatedAt }) => {
         setLoading(false);
         const publisherData = publisherResponse.data;
         setPublisher(publisherData);
-        let formattedDate = new Date(updatedAt);
-        setDate(formattedDate.toString());
+        // let formattedDate = new Date(updatedAt);
+        setDate(convertUTCDateToLocalDate(updatedAt));
     }
 
     return (
-        <View style={styles.entityStatusContainer}>
-            <Text style={styles.titleText}>{entityName} status:</Text>
-            {publisher ? (
-                <>
-                    <Text style={styles.detailsText}>
-                        Updated by: {publisher.firstName} {publisher.lastName}
-                    </Text>
-                    <Text style={styles.detailsText}>Updated at: {date}</Text>
-                </>
-            ) : null}
+        <View style={styles.container}>
+            <View style={styles.entityStatusContainer}>
+                <Text style={styles.titleText}>{entityName} status:</Text>
+                {publisher ? (
+                    <>
+                        <Text style={styles.detailsText}>
+                            Last updated by: {publisher.firstName}{' '}
+                            {publisher.lastName}
+                        </Text>
+                        <Text style={styles.detailsText}>
+                            Updated at: {date}
+                        </Text>
+                    </>
+                ) : null}
+            </View>
         </View>
     );
 };

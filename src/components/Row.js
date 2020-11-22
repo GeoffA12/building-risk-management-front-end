@@ -1,16 +1,12 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import IconButton from './IconButton';
-import { DARK_BLUE } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     row: {
         flex: 1,
         alignSelf: 'center',
         flexDirection: 'row',
-        // borderWidth: 1,
-        // borderColor: `${DARK_BLUE}`,
-        // borderRadius: 10,
         padding: 8,
         marginHorizontal: 8,
         marginVertical: 2,

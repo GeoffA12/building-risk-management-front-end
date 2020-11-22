@@ -4,6 +4,8 @@
 export const navigationRoutes = {
     REGISTRATION: 'Registration',
     LOGIN: 'Login',
-    USERLIST: 'UserList',
+    SITEADMINLIST: 'SiteAdminList',
     SPLASHSCREEN: 'SplashScreen',
+    RISKASSESSMENTLIST: 'RiskAssessmentList',
+    RISKASSESSMENTEDITOR: 'RiskAssessmentEditor',
 };

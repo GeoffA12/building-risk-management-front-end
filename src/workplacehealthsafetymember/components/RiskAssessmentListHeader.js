@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { SearchBar } from 'react-native-elements';
-import ShowHideToggleButton from '../components/ShowHideToggleButton';
-import EnhancedPicker from '../components/EnhancedPicker';
-import { DARK_BLUE, LIGHT_TEAL } from '../styles/Colors';
-import SiteRoles from '../config/SiteRolesConfig';
+import ShowHideToggleButton from '../../components/ShowHideToggleButton';
+import EnhancedPicker from '../../components/EnhancedPicker';
+import { riskAssessmentPickerOptions } from '../config/PickerOptions';
+import { DARK_BLUE, LIGHT_TEAL } from '../../styles/Colors';
 
 const styles = StyleSheet.create({
     rowContainer: {
@@ -46,14 +46,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: `${LIGHT_TEAL}`,
     },
-    picker: {
-        width: 215,
-    },
-    pickerContainer: {
-        width: '95%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+    filter: {
+        width: 200,
     },
     addIconButton: {
         flex: 1,
@@ -73,35 +67,35 @@ const styles = StyleSheet.create({
         width: '70%',
         textAlign: 'center',
     },
+    pickerContainer: {
+        width: '90%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
 
-const ListHeader = ({
+const RiskAssessmentListHeader = ({
     searchText,
     handleSearchTextChange,
     handleCancelPress,
     placeholder,
-    handleSiteRoleChange,
-    selectedSiteRole,
+    handleFilterValueChange,
+    selectedFilterValue,
 }) => {
     const [openFilters, setOpenFilters] = useState(false);
     const [filterButtonTitle, setFilterButtonTitle] = useState(
         'Show search filters'
     );
 
-    function setSiteRolePickerOptions() {
-        const siteRoles = Object.keys(SiteRoles);
+    function setRiskAssessmentPickerOptions() {
         let pickerOptions = [];
-        pickerOptions.push({
-            label: 'Site role',
-            value: '0',
+        Object.keys(riskAssessmentPickerOptions).map((optionKey) => {
+            pickerOptions.push({
+                label: riskAssessmentPickerOptions[optionKey].label,
+                value: riskAssessmentPickerOptions[optionKey].value,
+            });
         });
-        for (let x = 0; x < siteRoles.length; ++x) {
-            let currentOption = {};
-            let currentSiteRoleKey = siteRoles[x];
-            currentOption.label = SiteRoles[currentSiteRoleKey].textField;
-            currentOption.value = SiteRoles[currentSiteRoleKey].apiEnumValue;
-            pickerOptions.push(currentOption);
-        }
         return pickerOptions;
     }
 
@@ -135,7 +129,7 @@ const ListHeader = ({
                         inputContainerStyle={styles.inputContainerStyle}
                         inputStyle={styles.inputStyle}
                         onChangeText={(text) => handleSearchTextChange(text)}
-                        onCancel={handleCancelPress}
+                        // onCancel={handleCancelPress}
                         value={searchText}
                     />
 
@@ -146,11 +140,11 @@ const ListHeader = ({
                         <View style={styles.doubleCell}>
                             <View style={styles.pickerContainer}>
                                 <EnhancedPicker
-                                    onChange={handleSiteRoleChange}
-                                    currentRoleSelected={selectedSiteRole}
-                                    pickerOptions={setSiteRolePickerOptions()}
-                                    prompt={'Select your site role'}
-                                    style={styles.picker}
+                                    onChange={handleFilterValueChange}
+                                    currentRoleSelected={selectedFilterValue}
+                                    pickerOptions={setRiskAssessmentPickerOptions()}
+                                    prompt={'Select Filter option: '}
+                                    style={styles.filter}
                                 />
                             </View>
                         </View>
@@ -161,4 +155,4 @@ const ListHeader = ({
     );
 };
 
-export default ListHeader;
+export default RiskAssessmentListHeader;
