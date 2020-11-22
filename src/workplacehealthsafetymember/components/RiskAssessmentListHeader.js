@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
+import axios from 'axios';
 import { SearchBar } from 'react-native-elements';
 import ShowHideToggleButton from '../../components/ShowHideToggleButton';
 import EnhancedPicker from '../../components/EnhancedPicker';
+import Loading from '../../components/Loading';
 import { riskAssessmentPickerOptions } from '../config/PickerOptions';
+import { BASE_URL } from '../../config/APIConfig';
 import { DARK_BLUE, LIGHT_TEAL } from '../../styles/Colors';
 
 const styles = StyleSheet.create({
@@ -82,11 +85,35 @@ const RiskAssessmentListHeader = ({
     placeholder,
     handleFilterValueChange,
     selectedFilterValue,
+    associatedSiteIds,
 }) => {
     const [openFilters, setOpenFilters] = useState(false);
     const [filterButtonTitle, setFilterButtonTitle] = useState(
         'Show search filters'
     );
+    const [loading, setLoading] = useState(false);
+    const [sites, setSites] = useState([]);
+
+    useEffect(() => {
+        getSites();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    async function getSites() {
+        let response;
+        try {
+            setLoading(true);
+            response = await axios.post(`${BASE_URL}/getSites`, {
+                siteIds: associatedSiteIds,
+            });
+        } catch (e) {
+            console.error(e);
+            setLoading(false);
+            return;
+        }
+        setLoading(false);
+        setSites(response.data);
+    }
 
     function setRiskAssessmentPickerOptions() {
         let pickerOptions = [];
@@ -96,6 +123,15 @@ const RiskAssessmentListHeader = ({
                 value: riskAssessmentPickerOptions[optionKey].value,
             });
         });
+        if (sites) {
+            for (let x = 0; x < sites.length; ++x) {
+                const siteObject = {
+                    label: sites[x].siteName,
+                    value: sites[x].id,
+                };
+                pickerOptions.push(siteObject);
+            }
+        }
         return pickerOptions;
     }
 
@@ -149,6 +185,7 @@ const RiskAssessmentListHeader = ({
                             </View>
                         </View>
                     </View>
+                    <Loading loading={loading} />
                 </>
             ) : null}
         </View>

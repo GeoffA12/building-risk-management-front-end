@@ -49,7 +49,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     const [filteredRiskAssessments, setFilteredRiskAssessments] = useState([]);
 
     useEffect(() => {
-        getRiskAssessments();
+        getRiskAssessments(user.associatedSiteIds);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -97,7 +97,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     //     setSelectedSiteRole(siteRole);
     // }
 
-    async function getRiskAssessments() {
+    async function getRiskAssessments(idList) {
         let riskAssessmentPages;
         setLoading(true);
         try {
@@ -108,7 +108,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
                         sortBy: 'updatedAt',
                         sortDirection: 'DESC',
                     },
-                    associatedSiteIds: user.associatedSiteIds,
+                    associatedSiteIds: idList,
                 }
             );
         } catch (e) {
@@ -120,16 +120,13 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     }
 
     function handleFilterValueChange(val) {
+        console.log(val);
         if (
             val === riskAssessmentPickerOptions.INITIAL_VALUE.value ||
             val === riskAssessmentPickerOptions.ALL_ASSESSMENTS.value
         ) {
             setFilteredRiskAssessments(riskAssessments);
-        } else {
-            console.log(user.id);
-            riskAssessments.map((riskAssessment) =>
-                console.log(riskAssessment.entityTrail)
-            );
+        } else if (val === riskAssessmentPickerOptions.MY_ASSESSMENTS.value) {
             let filteredAssessments = [];
             for (let x = 0; x < riskAssessments.length; ++x) {
                 const currentAssessment = riskAssessments[x];
@@ -141,6 +138,9 @@ const RiskAssessmentListScreen = ({ navigation }) => {
                 }
             }
             setFilteredRiskAssessments(filteredAssessments);
+        } else {
+            const idList = [val];
+            getRiskAssessments(idList);
         }
         setSelectedFilterValue(val);
     }
@@ -160,7 +160,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
 
     function handleRefresh() {
         setRefreshing(true);
-        getRiskAssessments();
+        getRiskAssessments(user.associatedSiteIds);
         setRefreshing(false);
     }
 
@@ -192,6 +192,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
                 placeholder={'Title..'}
                 handleFilterValueChange={handleFilterValueChange}
                 selectedFilterValue={selectedFilterValue}
+                associatedSiteIds={user.associatedSiteIds}
             />
 
             <FlatList
