@@ -3,7 +3,7 @@ import axios from 'axios';
 import SecureStorage from 'react-native-secure-storage';
 import { createAction } from '../utils/CreateAction';
 import { BASE_URL } from '../config/APIConfig';
-import { SiteRoles } from '../config/SiteRolesConfig';
+import SiteRoles from '../config/SiteRolesConfig';
 
 export const useAuth = () => {
     const userKey = 'user';

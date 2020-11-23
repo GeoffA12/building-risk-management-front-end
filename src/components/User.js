@@ -1,13 +1,14 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import FlatListCard from './FlatListCard';
-import { SiteRoles } from '../config/SiteRolesConfig';
+import SiteRoles from '../config/SiteRolesConfig';
 import { LIGHT_TEAL } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     card: {
-        marginVertical: 10,
-        marginHorizontal: 5,
+        // marginVertical: 10,
+        // marginHorizontal: 5,
+        marginVertical: 15,
     },
     siteInfoContainer: {
         padding: 6,

@@ -4,7 +4,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash.isequal';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import UserContext from '../contexts/UserContext';
 import Heading from '../components/Heading';
 import FormInput from '../components/FormInput';
 import StyledButton from '../components/StyledButton';
@@ -16,7 +15,7 @@ import AuthContext from '../contexts/AuthContext';
 import EnhancedPicker from '../components/EnhancedPicker';
 import Row from '../components/Row';
 import Loading from '../components/Loading';
-import { SiteRoles } from '../config/SiteRolesConfig';
+import SiteRoles from '../config/SiteRolesConfig';
 import { DARK_BLUE, LIGHT_TEAL, DISABLED_BUTTON } from '../styles/Colors';
 import { BASE_URL } from '../config/APIConfig';
 import EntityStatus from '../components/EntityStatus';
@@ -70,6 +69,16 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginVertical: 8,
         marginHorizontal: 8,
+    },
+    pickerContainer: {
+        width: '70%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 7,
+    },
+    picker: {
+        width: 250,
     },
 });
 
@@ -562,30 +571,39 @@ const UserForm = ({ navigation, formTitle, userId, leaveFormPress }) => {
                             }
                             value={userModelPlayground.password}
                         />
-                        <EnhancedPicker
-                            onChange={handleSiteRoleChange}
-                            currentRoleSelected={selectedSiteRole}
-                            pickerOptions={setSiteRolePickerOptions()}
-                            prompt={'Select your site role'}
-                        />
+                        <View style={styles.pickerContainer}>
+                            <EnhancedPicker
+                                onChange={handleSiteRoleChange}
+                                currentRoleSelected={selectedSiteRole}
+                                pickerOptions={setSiteRolePickerOptions()}
+                                prompt={'Select your site role'}
+                                style={styles.picker}
+                            />
+                        </View>
                     </>
                 )}
-                <EnhancedPicker
-                    onChange={handleSiteChange}
-                    currentRoleSelected={selectedSite}
-                    pickerOptions={setSitePickerOptions()}
-                    prompt={'Select your site'}
-                />
+                <View style={styles.pickerContainer}>
+                    <EnhancedPicker
+                        onChange={handleSiteChange}
+                        currentRoleSelected={selectedSite}
+                        pickerOptions={setSitePickerOptions()}
+                        prompt={'Select your site'}
+                        style={styles.picker}
+                    />
+                </View>
 
                 {renderAssociatedSiteRows()}
 
                 {showSiteMaintenanceManagers ? (
-                    <EnhancedPicker
-                        onChange={handleSiteMaintenanceManagerChange}
-                        currentRoleSelected={selectedSiteMaintenanceManager}
-                        pickerOptions={setSiteMaintenanceManagerPickerOptions()}
-                        prompt={'Select your manager'}
-                    />
+                    <View style={styles.pickerContainer}>
+                        <EnhancedPicker
+                            onChange={handleSiteMaintenanceManagerChange}
+                            currentRoleSelected={selectedSiteMaintenanceManager}
+                            pickerOptions={setSiteMaintenanceManagerPickerOptions()}
+                            prompt={'Select your manager'}
+                            style={styles.picker}
+                        />
+                    </View>
                 ) : null}
 
                 {!userId ? (

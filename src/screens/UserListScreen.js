@@ -1,14 +1,13 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { StyleSheet, FlatList, View, Modal, Text } from 'react-native';
+import { StyleSheet, FlatList, View, Modal } from 'react-native';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
-import UserContext from '../contexts/UserContext';
 import UserForm from '../forms/UserForm';
 import HeaderButton from '../components/HeaderButton';
 import User from '../components/User';
 import Loading from '../components/Loading';
 import ListHeader from '../components/ListHeader';
-import { SiteRoles } from '../config/SiteRolesConfig';
+import SiteRoles from '../config/SiteRolesConfig';
 import { BASE_URL } from '../config/APIConfig';
 import { LIGHT_TEAL } from '../styles/Colors';
 

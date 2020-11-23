@@ -1,7 +1,7 @@
 /**
 Site Roles Config, used in User APIs
 **/
-export const SiteRoles = {
+const SiteRoles = {
     SITEADMIN: {
         textField: 'Site Admin',
         apiEnumValue: 'SITEADMIN',
@@ -23,3 +23,5 @@ export const SiteRoles = {
         urlValue: 'WorkplaceHealthSafetyMember',
     },
 };
+
+export default SiteRoles;
