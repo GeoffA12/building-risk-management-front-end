@@ -162,8 +162,6 @@ const RiskAssessmentEditorScreen = ({ navigation, route }) => {
         setRiskAssessmentModel(existingRiskAssessment);
     }
 
-    console.log(riskAssessmentPlayground);
-
     async function handleCreateRiskAssessment() {
         let response;
         let uri;
@@ -237,7 +235,6 @@ const RiskAssessmentEditorScreen = ({ navigation, route }) => {
     }
 
     function handleAddScreenerPress() {
-        // TODO: Add a new screener object to the riskAssessmentPlayground
         const newScreener = {
             question: '',
             response: 'EMPTY',
@@ -438,6 +435,7 @@ const RiskAssessmentEditorScreen = ({ navigation, route }) => {
                         }
                         placeholderTextColor={`${LIGHT_TEAL}`}
                         value={riskAssessmentPlayground.taskDescription}
+                        multiline={true}
                     />
                 </View>
             </View>

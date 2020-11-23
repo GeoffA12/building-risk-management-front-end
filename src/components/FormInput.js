@@ -12,7 +12,8 @@ const styles = StyleSheet.create({
 });
 
 const FormInput = ({ style, ...props }) => {
-    const [formLineHeight, setFormLineHeight] = useState(35);
+    const defaultLineHeight = 48;
+    const [formLineHeight, setFormLineHeight] = useState(defaultLineHeight);
 
     function handleFormLineHeightChange(event) {
         setFormLineHeight(event.nativeEvent.contentSize.height);
@@ -24,10 +25,10 @@ const FormInput = ({ style, ...props }) => {
             style={[
                 styles.input,
                 style,
-                { height: Math.max(35, formLineHeight) },
+                { height: Math.max(defaultLineHeight, formLineHeight) },
             ]}
             onContentSizeChange={handleFormLineHeightChange}
-            multiline={true}
+            // multiline={true}
         />
     );
 };

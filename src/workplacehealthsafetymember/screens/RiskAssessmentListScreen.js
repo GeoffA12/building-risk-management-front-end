@@ -83,20 +83,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchText]);
 
-    // async function handleSiteRoleChange(siteRole) {
-    //     console.log(siteRole);
-    //     if (SiteRoles.hasOwnProperty(siteRole)) {
-    //         const filteredUsersBySiteRole = users.filter(
-    //             (existingUser) =>
-    //                 existingUser.siteRole === SiteRoles[siteRole].apiEnumValue
-    //         );
-    //         setFilteredUsers(filteredUsersBySiteRole);
-    //     } else {
-    //         setFilteredUsers(users);
-    //     }
-    //     setSelectedSiteRole(siteRole);
-    // }
-
     async function getRiskAssessments(idList) {
         let riskAssessmentPages;
         setLoading(true);
@@ -175,17 +161,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            {/* <Modal visible={modalOpen} animationType={'slide'}>
-                <View>
-                    <UserForm
-                        navigation={navigation}
-                        formTitle={formTitle}
-                        leaveFormPress={handleLeaveFormPress}
-                        userId={userId}
-                    />
-                </View>
-            </Modal> */}
-
             <RiskAssessmentListHeader
                 searchText={searchText}
                 handleSearchTextChange={setSearchText}

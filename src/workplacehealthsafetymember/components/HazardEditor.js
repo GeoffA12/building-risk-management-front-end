@@ -157,6 +157,7 @@ const HazardEditor = ({
                         placeholderTextColor={`${LIGHT_GRAY}`}
                         onChangeText={handleDirectionsChange}
                         value={directions}
+                        multiline={true}
                     />
                 </View>
             </View>
