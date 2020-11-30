@@ -8,4 +8,6 @@ export const navigationRoutes = {
     SPLASHSCREEN: 'SplashScreen',
     RISKASSESSMENTLIST: 'RiskAssessmentList',
     RISKASSESSMENTEDITOR: 'RiskAssessmentEditor',
+    BUILDINGRISKASSESSMENTLIST: 'BuildingRiskAssessmentList',
+    BUILDINGRISKASSESSMENTEDITOR: 'BuildingRiskAssessmentEditor',
 };

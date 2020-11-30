@@ -43,9 +43,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [userId, setUserId] = useState('');
-    const [formTitle, setFormTitle] = useState('');
     const [filteredRiskAssessments, setFilteredRiskAssessments] = useState([]);
 
     useEffect(() => {
@@ -132,6 +129,8 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     }
 
     function handleRiskAssessmentCardPress(event) {
+        console.log('Card in risk assessment list pressed.');
+        console.log(event);
         console.log(event.id);
         navigation.navigate(navigationRoutes.RISKASSESSMENTEDITOR, {
             riskAssessmentId: event.id,
@@ -155,6 +154,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
             <RiskAssessment
                 riskAssessment={existingRiskAssessment}
                 onPress={handleRiskAssessmentCardPress}
+                activeView={false}
             />
         );
     }

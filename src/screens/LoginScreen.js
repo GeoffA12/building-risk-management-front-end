@@ -42,6 +42,7 @@ const LoginScreen = ({ navigation }) => {
             console.error(e);
             setError(e.message);
             setLoading(false);
+            return;
         }
     }
 
