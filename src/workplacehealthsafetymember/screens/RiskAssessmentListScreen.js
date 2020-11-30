@@ -103,7 +103,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     }
 
     function handleFilterValueChange(val) {
-        console.log(val);
         if (
             val === riskAssessmentPickerOptions.INITIAL_VALUE.value ||
             val === riskAssessmentPickerOptions.ALL_ASSESSMENTS.value
@@ -129,9 +128,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     }
 
     function handleRiskAssessmentCardPress(event) {
-        console.log('Card in risk assessment list pressed.');
-        console.log(event);
-        console.log(event.id);
         navigation.navigate(navigationRoutes.RISKASSESSMENTEDITOR, {
             riskAssessmentId: event.id,
         });
