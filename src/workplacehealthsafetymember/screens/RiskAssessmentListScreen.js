@@ -43,9 +43,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [userId, setUserId] = useState('');
-    const [formTitle, setFormTitle] = useState('');
     const [filteredRiskAssessments, setFilteredRiskAssessments] = useState([]);
 
     useEffect(() => {
@@ -106,7 +103,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     }
 
     function handleFilterValueChange(val) {
-        console.log(val);
         if (
             val === riskAssessmentPickerOptions.INITIAL_VALUE.value ||
             val === riskAssessmentPickerOptions.ALL_ASSESSMENTS.value
@@ -132,7 +128,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     }
 
     function handleRiskAssessmentCardPress(event) {
-        console.log(event.id);
         navigation.navigate(navigationRoutes.RISKASSESSMENTEDITOR, {
             riskAssessmentId: event.id,
         });
@@ -155,6 +150,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
             <RiskAssessment
                 riskAssessment={existingRiskAssessment}
                 onPress={handleRiskAssessmentCardPress}
+                activeView={false}
             />
         );
     }

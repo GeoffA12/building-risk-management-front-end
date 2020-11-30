@@ -12,6 +12,7 @@ export const useRiskAssessment = () => {
         taskDescription: '',
         hazards: [],
         screeners: [],
+        siteMaintenanceAssociateIds: [],
     });
     return {
         riskAssessmentModel,

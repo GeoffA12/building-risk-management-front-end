@@ -28,7 +28,6 @@ const FormInput = ({ style, ...props }) => {
                 { height: Math.max(defaultLineHeight, formLineHeight) },
             ]}
             onContentSizeChange={handleFormLineHeightChange}
-            // multiline={true}
         />
     );
 };

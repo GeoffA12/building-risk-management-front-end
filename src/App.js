@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AuthStackNavigator from './navigators/AuthStackNavigator';
 import SiteAdminStackNavigator from './navigators/SiteAdminStackNavigator';
 import WorkplaceHealthSafetyMemberStackNavigator from './navigators/WorkplaceHealthSafetyMemberStackNavigator';
+import SiteMaintenanceManagerNavigator from './navigators/SiteMaintenanceManagerNavigator';
 import SplashScreen from './screens/SplashScreen';
 import AuthContext from './contexts/AuthContext';
 import { navigationRoutes } from './config/NavConfig';
@@ -28,6 +29,12 @@ const App = () => {
                 return (
                     <RootStack.Screen name={'WorkplaceHealthSafetyMemberStack'}>
                         {() => <WorkplaceHealthSafetyMemberStackNavigator />}
+                    </RootStack.Screen>
+                );
+            case SiteRoles.SITEMAINTENANCEMGR.apiEnumValue:
+                return (
+                    <RootStack.Screen name={'SiteMaintenanceManagerStack'}>
+                        {() => <SiteMaintenanceManagerNavigator />}
                     </RootStack.Screen>
                 );
             default:

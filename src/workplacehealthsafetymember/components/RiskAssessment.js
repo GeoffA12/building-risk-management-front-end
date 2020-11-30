@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
+import PropTypes from 'prop-types';
 import FlatListCard from '../../components/FlatListCard';
 import { convertUTCDateToLocalDate } from '../../utils/Time';
 import { LIGHT_GRAY, LIGHT_TEAL } from '../../styles/Colors';
@@ -29,17 +30,47 @@ const styles = StyleSheet.create({
     },
 });
 
-const RiskAssessment = ({ riskAssessment, onPress }) => {
+const RiskAssessment = ({
+    riskAssessment,
+    onPress,
+    activeView,
+    index,
+    wasPreviouslySelected,
+}) => {
+    const [assessmentActive, setAssessmentActive] = useState(
+        wasPreviouslySelected
+    );
+
     function getTimePrefix() {
         return riskAssessment.entityTrail.length > 1
             ? 'Updated at: '
             : 'Created at: ';
     }
 
+    useEffect(() => {
+        if (activeView) {
+            onPress(riskAssessment, assessmentActive, index);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [assessmentActive]);
+
+    function handleOnPressActiveView() {
+        setAssessmentActive((prevActiveValue) => {
+            return !prevActiveValue;
+        });
+    }
+
+    function handleOnPressInactiveView() {
+        onPress(riskAssessment);
+    }
+
     return (
         <FlatListCard
             style={styles.card}
-            onPress={() => onPress(riskAssessment)}>
+            isActive={assessmentActive}
+            onPress={
+                activeView ? handleOnPressActiveView : handleOnPressInactiveView
+            }>
             <View stlye={styles.contentContainer}>
                 <Text style={styles.title}>{riskAssessment.title}</Text>
                 <Text
@@ -55,6 +86,20 @@ const RiskAssessment = ({ riskAssessment, onPress }) => {
             </View>
         </FlatListCard>
     );
+};
+
+RiskAssessment.propTypes = {
+    riskAssessment: PropTypes.object.isRequired,
+    onPress: PropTypes.func.isRequired,
+    activeView: PropTypes.bool,
+    index: PropTypes.number,
+    wasPreviouslySelected: PropTypes.bool,
+};
+
+RiskAssessment.defaultProps = {
+    activeView: false,
+    index: -1,
+    wasPreviouslySelected: false,
 };
 
 export default RiskAssessment;

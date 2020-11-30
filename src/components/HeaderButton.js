@@ -4,7 +4,7 @@ import IconButton from './IconButton';
 
 const styles = StyleSheet.create({
     container: {
-        marginRight: 25,
+        marginRight: 17,
     },
 });
 

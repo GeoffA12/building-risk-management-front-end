@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { DARK_BLUE } from '../styles/Colors';
+import { DARK_BLUE, DARK_PURPLE } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     card: {
@@ -18,9 +18,17 @@ const styles = StyleSheet.create({
     },
 });
 
-const FlatListCard = ({ style, children, onPress }) => {
+const FlatListCard = ({ style, children, onPress, isActive }) => {
     return (
-        <TouchableOpacity style={[styles.card, style]} onPress={onPress}>
+        <TouchableOpacity
+            style={[
+                styles.card,
+                style,
+                isActive
+                    ? { backgroundColor: `${DARK_PURPLE}` }
+                    : { backgroundColor: `${DARK_BLUE}` },
+            ]}
+            onPress={onPress}>
             <View style={styles.cardContent}>{children}</View>
         </TouchableOpacity>
     );
