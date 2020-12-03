@@ -28,6 +28,7 @@ import {
     DISABLED_BUTTON,
 } from '../../styles/Colors';
 import { navigationRoutes } from '../../config/NavConfig';
+import EntityStatus from '../../components/EntityStatus';
 
 const styles = StyleSheet.create({
     container: {
@@ -563,6 +564,20 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
             </View>
+            {route.params.buildingRiskAssessmentId &&
+            buildingRiskAssessmentPlayground.entityTrail &&
+            buildingRiskAssessmentPlayground.entityTrail.length > 0 ? (
+                <EntityStatus
+                    entityName={'Building Assessment'}
+                    publisherId={
+                        buildingRiskAssessmentPlayground.entityTrail[
+                            buildingRiskAssessmentPlayground.entityTrail
+                                .length - 1
+                        ].userId
+                    }
+                    updatedAt={buildingRiskAssessmentPlayground.updatedAt}
+                />
+            ) : null}
             <Error errorMessage={error} />
             <View style={styles.splitContainer}>
                 <View style={styles.inputRow}>
