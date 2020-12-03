@@ -56,7 +56,7 @@ const Screener = ({
                     style={styles.formInput}
                     onChangeText={(val) => onChangeText(val, screenerIndex)}
                     value={questionText}
-                    placeholder={'Ex: Who is your manager?'}
+                    placeholder={'Ex: Are working conditions safe?'}
                     placeholderTextColor={`${LIGHT_GRAY}`}
                 />
             </View>
