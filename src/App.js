@@ -2,15 +2,15 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import AuthStackNavigator from './navigators/AuthStackNavigator';
-import SiteAdminStackNavigator from './navigators/SiteAdminStackNavigator';
-import WorkplaceHealthSafetyMemberStackNavigator from './navigators/WorkplaceHealthSafetyMemberStackNavigator';
-import SiteMaintenanceManagerNavigator from './navigators/SiteMaintenanceManagerNavigator';
-import SplashScreen from './screens/SplashScreen';
-import AuthContext from './contexts/AuthContext';
+import AuthStackNavigator from './auth/navigators/AuthStackNavigator';
+import SiteAdminStackNavigator from './users/navigators/SiteAdminStackNavigator';
+import WorkplaceHealthSafetyMemberStackNavigator from './riskassessment/navigators/WorkplaceHealthSafetyMemberStackNavigator';
+import SiteMaintenanceManagerNavigator from './buildingriskassessment/navigators/SiteMaintenanceManagerNavigator';
+import SplashScreen from './auth/screens/SplashScreen';
+import AuthContext from './auth/contexts/AuthContext';
 import { navigationRoutes } from './config/NavConfig';
 import SiteRoles from './config/SiteRolesConfig';
-import { useAuth } from './hooks/Auth';
+import { useAuth } from './auth/hooks/Auth';
 
 const RootStack = createStackNavigator();
 
