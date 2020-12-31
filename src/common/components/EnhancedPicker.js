@@ -34,7 +34,6 @@ const EnhancedPicker = ({
     prompt,
     style,
 }) => {
-    console.log(pickerOptions);
     return (
         <View style={styles.container}>
             <Picker

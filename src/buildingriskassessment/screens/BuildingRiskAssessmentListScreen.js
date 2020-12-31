@@ -1,12 +1,13 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { Text, View, StyleSheet, FlatList } from 'react-native';
-import axios from 'axios';
+import { View, StyleSheet, FlatList } from 'react-native';
 import AuthContext from '../../auth/contexts/AuthContext';
 import Loading from '../../common/components/Loading';
+import Error from '../../common/components/Error';
 import BuildingRiskAssessment from '../components/BuildingRiskAssessment';
-import HeaderButton from '../../common/components/HeaderButton';
+import { useHeader } from '../../common/hooks/Header';
 import { navigationRoutes } from '../../config/NavConfig';
-import { BASE_URL } from '../../config/APIConfig';
+import { useAPI } from '../../common/hooks/API';
+import { useBuildingRiskAssessment } from '../hooks/BuildingRiskAssessmentHooks';
 
 const styles = StyleSheet.create({
     headerContainer: {
@@ -28,63 +29,45 @@ const BuildingRiskAssessmentListScreen = ({ navigation }) => {
         user,
     } = useContext(AuthContext);
 
+    const { setListHeader } = useHeader();
+    const { getBuildingRiskAssessments } = useBuildingRiskAssessment();
+    const { loading, setLoading, error, setError } = useAPI();
+
     const [buildingRiskAssessments, setBuildingRiskAssessments] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
-        getBuildingRiskAssessments();
+        loadBuildingRiskAssessments();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function handleAddBuildingRiskAssessmentPress() {
         navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
             buildingRiskAssessmentId: undefined,
-            riskAssessmentId: undefined,
+            riskAssessmentSchedule: undefined,
         });
     }
 
     useEffect(() => {
-        navigation.setOptions({
-            headerRight: () => (
-                <View style={styles.headerContainer}>
-                    <HeaderButton
-                        name={'add'}
-                        onPress={handleAddBuildingRiskAssessmentPress}
-                    />
-                    <HeaderButton name={'exit'} onPress={() => logout()} />
-                </View>
-            ),
-        });
+        setListHeader(navigation, handleAddBuildingRiskAssessmentPress, logout);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigation, logout]);
 
-    async function getBuildingRiskAssessments() {
-        let response;
+    async function loadBuildingRiskAssessments() {
         setLoading(true);
-        try {
-            response = await axios.post(
-                `${BASE_URL}/getBuildingRiskAssessmentsBySite`,
-                {
-                    associatedSiteIds: user.associatedSiteIds,
-                }
-            );
-            if (error) {
-                setError('');
-            }
-        } catch (e) {
-            console.error(e);
-            setError(e.message);
-            setLoading(false);
-            return;
-        }
+        const buildingRiskAssessmentsResponse = await getBuildingRiskAssessments(
+            user.associatedSiteIds
+        );
         setLoading(false);
-        setBuildingRiskAssessments(response.data);
+        if (!buildingRiskAssessmentsResponse.data) {
+            setError(buildingRiskAssessmentsResponse.error.message);
+            console.error(buildingRiskAssessmentsResponse.error);
+        } else {
+            setBuildingRiskAssessments(buildingRiskAssessmentsResponse.data);
+        }
     }
 
     function handleBuildingRiskAssessmentCardPress(event) {
-        console.log(event);
         navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
             buildingRiskAssessmentId: event.id,
             riskAssessmentId: event.riskAssessmentIds[0],
@@ -110,6 +93,7 @@ const BuildingRiskAssessmentListScreen = ({ navigation }) => {
 
     return (
         <View style={styles.pageContainer}>
+            <Error errorMessage={error} />
             <FlatList
                 data={buildingRiskAssessments}
                 renderItem={renderBuildingRiskAssessment}

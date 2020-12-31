@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
 });
 
 const FormInput = ({ style, ...props }) => {
-    const defaultLineHeight = 48;
+    const defaultLineHeight = 42;
     const [formLineHeight, setFormLineHeight] = useState(defaultLineHeight);
 
     function handleFormLineHeightChange(event) {

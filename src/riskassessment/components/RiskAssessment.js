@@ -30,47 +30,17 @@ const styles = StyleSheet.create({
     },
 });
 
-const RiskAssessment = ({
-    riskAssessment,
-    onPress,
-    activeView,
-    index,
-    wasPreviouslySelected,
-}) => {
-    const [assessmentActive, setAssessmentActive] = useState(
-        wasPreviouslySelected
-    );
-
+const RiskAssessment = ({ riskAssessment, onPress }) => {
     function getTimePrefix() {
         return riskAssessment.entityTrail.length > 1
             ? 'Updated at: '
             : 'Created at: ';
     }
 
-    useEffect(() => {
-        if (activeView) {
-            onPress(riskAssessment, assessmentActive, index);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [assessmentActive]);
-
-    function handleOnPressActiveView() {
-        setAssessmentActive((prevActiveValue) => {
-            return !prevActiveValue;
-        });
-    }
-
-    function handleOnPressInactiveView() {
-        onPress(riskAssessment);
-    }
-
     return (
         <FlatListCard
             style={styles.card}
-            isActive={assessmentActive}
-            onPress={
-                activeView ? handleOnPressActiveView : handleOnPressInactiveView
-            }>
+            onPress={() => onPress(riskAssessment)}>
             <View stlye={styles.contentContainer}>
                 <Text style={styles.title}>{riskAssessment.title}</Text>
                 <Text
@@ -91,15 +61,6 @@ const RiskAssessment = ({
 RiskAssessment.propTypes = {
     riskAssessment: PropTypes.object.isRequired,
     onPress: PropTypes.func.isRequired,
-    activeView: PropTypes.bool,
-    index: PropTypes.number,
-    wasPreviouslySelected: PropTypes.bool,
-};
-
-RiskAssessment.defaultProps = {
-    activeView: false,
-    index: -1,
-    wasPreviouslySelected: false,
 };
 
 export default RiskAssessment;

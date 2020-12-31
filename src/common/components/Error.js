@@ -15,9 +15,13 @@ const styles = StyleSheet.create({
 
 const Error = ({ errorMessage }) => {
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>{errorMessage}</Text>
-        </View>
+        <>
+            {errorMessage ? (
+                <View style={styles.container}>
+                    <Text style={styles.text}>{errorMessage}</Text>
+                </View>
+            ) : null}
+        </>
     );
 };
 

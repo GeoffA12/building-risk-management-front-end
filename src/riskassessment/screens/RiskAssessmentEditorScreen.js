@@ -99,7 +99,11 @@ const styles = StyleSheet.create({
     },
 });
 
-const RiskAssessmentEditorScreen = ({ navigation, route }) => {
+const RiskAssessmentEditorScreen = ({
+    navigation,
+    route,
+    riskAssessmentId,
+}) => {
     const { user } = useContext(AuthContext);
     const [modalOpen, setModalOpen] = useState(false);
     const { error, setError, loading, setLoading } = useAPI();
@@ -119,8 +123,10 @@ const RiskAssessmentEditorScreen = ({ navigation, route }) => {
     const [hasDeletePermissions, setHasDeletePermissions] = useState(false);
 
     useEffect(() => {
-        if (route.params.riskAssessmentId) {
+        if (route && route.params && route.params.riskAssessmentId) {
             loadRiskAssessment(route.params.riskAssessmentId);
+        } else if (riskAssessmentId) {
+            loadRiskAssessment(riskAssessmentId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

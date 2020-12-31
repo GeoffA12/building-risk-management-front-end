@@ -10,6 +10,7 @@ import BuildingRiskAssessmentListScreen from '../screens/BuildingRiskAssessmentL
 import RiskAssessmentListScreen from '../../riskassessment/screens/RiskAssessmentListScreen';
 import BuildingRiskAssessmentEditorScreen from '../screens/BuilidingRiskAssessmentEditorScreen';
 import RiskAssessmentEditorScreen from '../../riskassessment/screens/RiskAssessmentEditorScreen';
+import RiskAssessmentScheduleEditorScreen from '../screens/RiskAssessmentScheduleEditorScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 const SiteMaintenanceManagerDrawer = createDrawerNavigator();
@@ -115,6 +116,14 @@ const SiteMaintenanceManagerNavigator = () => {
                     component={BuildingRiskAssessmentEditorScreen}
                     options={{
                         title: 'Building Assessment Editor',
+                        headerTitleAlign: 'center',
+                    }}
+                />
+                <SiteMaintenanceManagerStack.Screen
+                    name={navigationRoutes.RISKASSESSMENTSCHEDULEEDITORSCREEN}
+                    component={RiskAssessmentScheduleEditorScreen}
+                    options={{
+                        title: 'Schedule Editor',
                         headerTitleAlign: 'center',
                     }}
                 />

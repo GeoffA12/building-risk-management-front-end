@@ -5,7 +5,6 @@ import { SearchBar } from 'react-native-elements';
 import ShowHideToggleButton from './ShowHideToggleButton';
 import EnhancedPicker from './EnhancedPicker';
 import { DARK_BLUE, LIGHT_TEAL } from '../styles/Colors';
-import SiteRoles from '../../config/SiteRolesConfig';
 
 const styles = StyleSheet.create({
     rowContainer: {

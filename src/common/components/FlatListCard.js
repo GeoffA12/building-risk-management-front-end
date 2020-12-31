@@ -18,17 +18,9 @@ const styles = StyleSheet.create({
     },
 });
 
-const FlatListCard = ({ style, children, onPress, isActive }) => {
+const FlatListCard = ({ style, children, onPress }) => {
     return (
-        <TouchableOpacity
-            style={[
-                styles.card,
-                style,
-                isActive
-                    ? { backgroundColor: `${DARK_PURPLE}` }
-                    : { backgroundColor: `${DARK_BLUE}` },
-            ]}
-            onPress={onPress}>
+        <TouchableOpacity style={[styles.card, style]} onPress={onPress}>
             <View style={styles.cardContent}>{children}</View>
         </TouchableOpacity>
     );
