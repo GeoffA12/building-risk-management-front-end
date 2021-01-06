@@ -8,7 +8,7 @@ import { navigationRoutes } from '../../config/NavConfig';
 import HeaderButton from '../../common/components/HeaderButton';
 import BuildingRiskAssessmentListScreen from '../screens/BuildingRiskAssessmentListScreen';
 import RiskAssessmentListScreen from '../../riskassessment/screens/RiskAssessmentListScreen';
-import BuildingRiskAssessmentEditorScreen from '../screens/BuilidingRiskAssessmentEditorScreen';
+import BuildingRiskAssessmentEditorScreen from '../screens/BuildingRiskAssessmentEditorScreen';
 import RiskAssessmentEditorScreen from '../../riskassessment/screens/RiskAssessmentEditorScreen';
 import RiskAssessmentScheduleEditorScreen from '../screens/RiskAssessmentScheduleEditorScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';

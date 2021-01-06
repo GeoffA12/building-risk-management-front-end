@@ -6,7 +6,7 @@ import { statusEnum } from '../config/StatusEnum';
 import { BASE_URL } from '../../config/APIConfig';
 
 export const useBuildingRiskAssessment = () => {
-    const { responseObject, setResponseObject, loadData } = useAPI();
+    const { responseObject, loadData } = useAPI();
 
     const [
         buildingRiskAssessmentModel,
@@ -21,18 +21,6 @@ export const useBuildingRiskAssessment = () => {
         buildingId: '',
         title: '',
         description: '',
-    });
-
-    const [
-        riskAssessmentScheduleModel,
-        setRiskAssessmentScheduleModel,
-    ] = useState({
-        title: '',
-        status: statusEnum.NOT_ASSIGNED.label,
-        dueDate: '',
-        riskLevel: riskLevelEnum.EMPTY.label,
-        siteMaintenanceAssociateIds: [],
-        workOrder: 0,
     });
 
     const { riskAssessmentModel, setRiskAssessmentModel } = useRiskAssessment();
@@ -91,15 +79,46 @@ export const useBuildingRiskAssessment = () => {
         return siteMaintenanceAssociatesResponse;
     }
 
+    async function saveBuildingRiskAssessment(uri, inputObject) {
+        let buildingRiskAssessmentResponse = { ...responseObject };
+        let buildingRiskAssessment;
+        try {
+            buildingRiskAssessment = await loadData(
+                `${BASE_URL}/${uri}`,
+                'POST',
+                inputObject
+            );
+            buildingRiskAssessmentResponse.data = buildingRiskAssessment;
+        } catch (e) {
+            buildingRiskAssessmentResponse.error = e;
+        }
+        return buildingRiskAssessmentResponse;
+    }
+
+    async function getBuildingRiskAssessment(buildingRiskAssessmentId) {
+        let buildingRiskAssessmentResponse = { ...responseObject };
+        let buildingRiskAssessment;
+        try {
+            buildingRiskAssessment = await loadData(
+                `${BASE_URL}/getBuildingRiskAssessmentById?id=${buildingRiskAssessmentId}`,
+                'GET'
+            );
+            buildingRiskAssessmentResponse.data = buildingRiskAssessment;
+        } catch (e) {
+            buildingRiskAssessment.error = e;
+        }
+        return buildingRiskAssessmentResponse;
+    }
+
     return {
         buildingRiskAssessmentModel,
         setBuildingRiskAssessmentModel,
-        riskAssessmentScheduleModel,
-        setRiskAssessmentScheduleModel,
         riskAssessmentModel,
         setRiskAssessmentModel,
         getBuildingRiskAssessments,
         getBuildings,
         getSiteMaintenanceAssociates,
+        saveBuildingRiskAssessment,
+        getBuildingRiskAssessment,
     };
 };

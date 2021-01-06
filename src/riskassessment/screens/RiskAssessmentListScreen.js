@@ -164,9 +164,9 @@ const RiskAssessmentListScreen = ({ navigation }) => {
         }
     }
 
-    function handleRefresh() {
+    async function handleRefresh() {
         setRefreshing(true);
-        getRiskAssessments(user.associatedSiteIds);
+        await loadRiskAssessments(user.associatedSiteIds);
         setRefreshing(false);
     }
 

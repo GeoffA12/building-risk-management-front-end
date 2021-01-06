@@ -16,7 +16,7 @@ export const useRiskAssessment = () => {
         taskDescription: '',
         hazards: [],
         screeners: [],
-        riskAssessmentSchedules: [],
+        riskAssessmentScheduleIds: [],
     });
 
     const [riskAssessmentPlayground, setRiskAssessmentPlayground] = useState(

@@ -70,13 +70,12 @@ const BuildingRiskAssessmentListScreen = ({ navigation }) => {
     function handleBuildingRiskAssessmentCardPress(event) {
         navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
             buildingRiskAssessmentId: event.id,
-            riskAssessmentId: event.riskAssessmentIds[0],
         });
     }
 
-    function handleRefresh() {
+    async function handleRefresh() {
         setRefreshing(true);
-        getBuildingRiskAssessments();
+        await loadBuildingRiskAssessments();
         setRefreshing(false);
     }
 

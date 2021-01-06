@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-import {
-    Text,
-    ScrollView,
-    View,
-    StyleSheet,
-    TouchableOpacity,
-} from 'react-native';
+import { ScrollView, View, StyleSheet, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import cloneDeep from 'lodash/cloneDeep';
 import Icon from 'react-native-ionicons';
 import MultiSelect from 'react-native-multiple-select';
 import RiskAssessmentEditorScreen from '../../riskassessment/screens/RiskAssessmentEditorScreen';
@@ -16,8 +11,10 @@ import Loading from '../../common/components/Loading';
 import Error from '../../common/components/Error';
 import FormInput from '../../common/components/FormInput';
 import { useBuildingRiskAssessment } from '../hooks/BuildingRiskAssessmentHooks';
+import { useRiskAssessmentSchedule } from '../hooks/RiskAssessmentScheduleHooks';
 import { stringsEnum } from '../config/StringsEnum';
 import { useAPI } from '../../common/hooks/API';
+import { buildingRiskAssessmentUtils } from '../utils/BuildingRiskAssessmentUtils';
 import {
     LIGHT_GRAY,
     DARK_BLUE,
@@ -120,11 +117,18 @@ const styles = StyleSheet.create({
 const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     const { user } = useContext(AuthContext);
     const { error, setError, loading, setLoading } = useAPI();
+    const { getSiteMaintenanceAssociates } = useBuildingRiskAssessment();
+
     const {
-        getSiteMaintenanceAssociates,
         riskAssessmentScheduleModel,
         setRiskAssessmentScheduleModel,
-    } = useBuildingRiskAssessment();
+        riskAssessmentSchedulePlayground,
+        setRiskAssessmentSchedulePlayground,
+        createRiskAssessmentSchedule,
+        updateRiskAssessmentSchedule,
+        getRiskAssessmentSchedule,
+    } = useRiskAssessmentSchedule();
+    const { formatDueDate } = buildingRiskAssessmentUtils();
 
     const [scheduleEditorOpen, setScheduleEditorOpen] = useState(false);
 
@@ -153,8 +157,34 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         loadSiteMaintenanceAssociates();
+        if (route.params.riskAssessmentScheduleId) {
+            loadRiskAssessmentSchedule(route.params.riskAssessmentScheduleId);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        setRiskAssessmentSchedulePlayground(
+            cloneDeep(riskAssessmentScheduleModel)
+        );
+        setSelectedSiteMaintenanceAssociates(
+            riskAssessmentScheduleModel.siteMaintenanceAssociateIds
+        );
+        setDate(new Date(riskAssessmentScheduleModel.dueDate));
+        setTime(new Date(riskAssessmentScheduleModel.dueDate));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [riskAssessmentScheduleModel]);
+
+    useEffect(() => {
+        if (route.params.riskAssessmentId) {
+            setRiskAssessmentScheduleModel((prevModel) => {
+                let updatedModel = { ...prevModel };
+                updatedModel.riskAssessmentId = route.params.riskAssessmentId;
+                return updatedModel;
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route]);
 
     useEffect(() => {
         const dropdownData = [];
@@ -172,7 +202,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         if (date && time) {
             handleRiskAssessmentScheduleChange(
                 'dueDate',
-                formatDate(date, time)
+                formatDueDate(date, time)
             );
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,6 +221,26 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedSiteMaintenanceAssociates]);
 
+    async function loadRiskAssessmentSchedule(id) {
+        setLoading(true);
+        const riskAssessmentScheduleResponse = await getRiskAssessmentSchedule(
+            id
+        );
+        setLoading(false);
+        if (!riskAssessmentScheduleResponse.data) {
+            console.error(riskAssessmentScheduleResponse.error);
+            setError(riskAssessmentScheduleResponse.error.message);
+        } else {
+            let riskAssessmentSchedule = {
+                ...riskAssessmentScheduleResponse.data,
+            };
+            riskAssessmentSchedule.dueDate = formatDueDate(
+                new Date(riskAssessmentSchedule.dueDate)
+            );
+            setRiskAssessmentScheduleModel(riskAssessmentSchedule);
+        }
+    }
+
     async function loadSiteMaintenanceAssociates() {
         setLoading(true);
         const siteMaintenanceAssociatesResponse = await getSiteMaintenanceAssociates(
@@ -207,9 +257,47 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         }
     }
 
+    // TODO: Disable the save button if the input is incorrect or nothing on the schedule form has been changed
+    async function handleSaveSchedulePress() {
+        setLoading(true);
+        let riskAssessmentScheduleIdToFetch;
+        if (route.params.riskAssessmentScheduleId) {
+            const updateRiskAssessmentScheduleResponse = await updateRiskAssessmentSchedule(
+                user.id,
+                route.params.riskAssessmentScheduleId,
+                riskAssessmentSchedulePlayground
+            );
+            if (!updateRiskAssessmentScheduleResponse.data) {
+                console.error(updateRiskAssessmentScheduleResponse.error);
+                setError(updateRiskAssessmentScheduleResponse.error.message);
+            } else {
+                riskAssessmentScheduleIdToFetch =
+                    updateRiskAssessmentScheduleResponse.data.id;
+            }
+        } else {
+            const createRiskAssessmentScheduleResponse = await createRiskAssessmentSchedule(
+                riskAssessmentSchedulePlayground,
+                user.id
+            );
+            if (!createRiskAssessmentScheduleResponse.data) {
+                console.error(createRiskAssessmentScheduleResponse.error);
+                setError(createRiskAssessmentScheduleResponse.error.message);
+            } else {
+                riskAssessmentScheduleIdToFetch =
+                    createRiskAssessmentScheduleResponse.data.id;
+            }
+        }
+        navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
+            buildingRiskAssessmentId: route.params.buildingRiskAssessmentId,
+            riskAssessmentId: route.params.riskAssessmentId,
+            riskAssessmentScheduleIdToFetch: riskAssessmentScheduleIdToFetch,
+            index: route.params.index,
+        });
+    }
+
     function handleRiskAssessmentScheduleChange(fieldKey, val) {
-        setRiskAssessmentScheduleModel((prevModel) => {
-            const updatedScheduleModel = { ...prevModel };
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
+            const updatedScheduleModel = { ...prevPlayground };
             updatedScheduleModel[fieldKey] = val;
             return updatedScheduleModel;
         });
@@ -224,15 +312,6 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     function handleCancelSchedulePress() {
         setScheduleEditorOpen((prevScheduleEditorMode) => {
             return !prevScheduleEditorMode;
-        });
-    }
-
-    // TODO: Disable the save button if the input is incorrect or nothing on the schedule form has been changed
-    function handleSaveSchedulePress() {
-        navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
-            buildingRiskAssessmentId: undefined,
-            riskAssessmentSchedule: riskAssessmentScheduleModel,
-            riskAssessmentId: route.params.riskAssessmentId,
         });
     }
 
@@ -275,10 +354,8 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         });
     }
 
-    function formatDate() {
-        return `${date.getFullYear()}/${
-            date.getMonth() + 1
-        }/${date.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}}`;
+    function formatDate(dateTimeString) {
+        return new Date(dateTimeString);
     }
 
     return (
@@ -288,7 +365,11 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                 <View style={styles.row}>
                     {!scheduleEditorOpen ? (
                         <StyledButton
-                            title={'Add new schedule'}
+                            title={
+                                route.params.riskAssessmentScheduleId
+                                    ? 'Edit schedule'
+                                    : 'Add new schedule'
+                            }
                             onPress={handleAddSchedulePress}
                             disabled={false}
                             style={styles.optionButton}
@@ -324,7 +405,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                 style={styles.titleInput}
                                 placeholder={'Title'}
                                 placeholderTextColor={`${LIGHT_GRAY}`}
-                                value={riskAssessmentScheduleModel.title}
+                                value={riskAssessmentSchedulePlayground.title}
                                 onChangeText={(val) =>
                                     handleRiskAssessmentScheduleChange(
                                         'title',
@@ -377,7 +458,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                     <DateTimePicker
                                         value={date}
                                         mode={mode}
-                                        is24Hour={true}
+                                        is24Hour={false}
                                         display="default"
                                         onChange={onDateTimeChange}
                                     />
@@ -389,7 +470,11 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                 style={styles.workOrderInput}
                                 placeholder={'Work order'}
                                 placeholderTextColor={`${LIGHT_GRAY}`}
-                                value={riskAssessmentScheduleModel.workOrder.toString()}
+                                value={
+                                    riskAssessmentSchedulePlayground.workOrder
+                                        ? riskAssessmentSchedulePlayground.workOrder.toString()
+                                        : ''
+                                }
                                 onChangeText={(val) =>
                                     handleRiskAssessmentScheduleChange(
                                         'workOrder',

@@ -9,7 +9,6 @@ import {
     LogBox,
 } from 'react-native';
 import Icon from 'react-native-ionicons';
-import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash.isequal';
 import AuthContext from '../../auth/contexts/AuthContext';
@@ -20,10 +19,11 @@ import Loading from '../../common/components/Loading';
 import Error from '../../common/components/Error';
 import EntityStatus from '../../common/components/EntityStatus';
 import RiskAssessmentSchedule from '../components/RiskAssessmentSchedule';
-import { BASE_URL } from '../../config/APIConfig';
 import { useBuildingRiskAssessment } from '../hooks/BuildingRiskAssessmentHooks';
 import { useRiskAssessment } from '../../riskassessment/hooks/RiskAssessmentHooks';
+import { useRiskAssessmentSchedule } from '../hooks/RiskAssessmentScheduleHooks';
 import { useAPI } from '../../common/hooks/API';
+import { buildingRiskAssessmentUtils } from '../utils/BuildingRiskAssessmentUtils';
 import {
     LIGHT_TEAL,
     LIGHT_GRAY,
@@ -129,13 +129,20 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         buildingRiskAssessmentModel,
         setBuildingRiskAssessmentModel,
         getBuildings,
+        saveBuildingRiskAssessment,
+        getBuildingRiskAssessment,
     } = useBuildingRiskAssessment();
+    const { riskAssessmentModel, getRiskAssessments } = useRiskAssessment();
     const {
-        riskAssessmentModel,
-        setRiskAssessmentModel,
-        getRiskAssessments,
-    } = useRiskAssessment();
+        getRiskAssessmentSchedulesByBuildingRiskAssessmentId,
+        getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding,
+        getRiskAssessmentSchedule,
+        deleteRiskAssessmentSchedule,
+        attachBuildingRiskAssessmentIdToRiskAssessmentSchedules,
+    } = useRiskAssessmentSchedule();
     const { error, setError, loading, setLoading } = useAPI();
+
+    const { formatRiskAssessmentSchedules } = buildingRiskAssessmentUtils();
 
     const [
         buildingRiskAssessmentPlayground,
@@ -146,88 +153,56 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         cloneDeep(riskAssessmentModel)
     );
 
+    const [riskAssessmentSchedules, setRiskAssessmentSchedules] = useState([]);
+
     const [riskAssessments, setRiskAssessments] = useState([]);
 
     const [selectedBuilding, setSelectedBuilding] = useState('0');
     const [buildings, setBuildings] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [isDirty, setIsDirty] = useState(true);
-    const [riskAssessmentSchedules, setRiskAssessmentSchedules] = useState([]);
 
     useEffect(() => {
         loadRiskAssessments();
         loadBuildings();
         if (route.params.buildingRiskAssessmentId) {
-            setBuildingRiskAssessment();
-            setRiskAssessment();
+            loadBuildingRiskAssessment(route.params.buildingRiskAssessmentId);
+            loadRiskAssessmentSchedules(route.params.buildingRiskAssessmentId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Can receive an index, riskAssessmentSchedule, or riskAssessmentId as a route parameter.
+
     useEffect(() => {
-        if (
-            route.params &&
-            route.params.riskAssessmentSchedule &&
-            !containsObject(
-                riskAssessmentSchedules,
-                route.params.riskAssessmentSchedule
-            )
-        ) {
-            setRiskAssessmentSchedules((prevSchedules) => {
-                let schedules = [];
-                if (prevSchedules && prevSchedules.length > 0) {
-                    schedules = [
-                        ...prevSchedules,
-                        route.params.riskAssessmentSchedule,
-                    ];
-                } else {
-                    schedules = [route.params.riskAssessmentSchedule];
-                }
-                return schedules;
-            });
-            const updatedRiskAssessmentSchedules =
-                riskAssessmentPlayground.riskAssessmentSchedules.length > 0
-                    ? [
-                          ...riskAssessmentPlayground.riskAssessmentSchedules,
-                          route.params.riskAssessmentSchedule,
-                      ]
-                    : [route.params.riskAssessmentSchedule];
-            setRiskAssessmentPlayground((prevPlayground) => {
-                const updatedPlayground = { ...prevPlayground };
-                updatedPlayground.riskAssessmentSchedules = updatedRiskAssessmentSchedules;
-                return updatedPlayground;
-            });
-        }
-        if (route.params && route.params.riskAssessmentId) {
-            const updatedRiskAssessmentIds =
-                buildingRiskAssessmentPlayground.riskAssessmentIds.length > 0
-                    ? [
-                          ...buildingRiskAssessmentPlayground.riskAssessmentIds,
-                          route.params.riskAssessmentId,
-                      ]
-                    : [route.params.riskAssessmentId];
-            handleBuildingRiskAssessmentPlaygroundChange(
-                'riskAssessmentIds',
-                updatedRiskAssessmentIds
+        console.log(route);
+        if (route.params.riskAssessmentId) {
+            setBuildingRiskAssessmentPlaygroundRiskAssessmentIds(
+                route.params.riskAssessmentId
             );
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [route]);
-
-    function containsObject(array, object) {
-        for (let x = 0; x < array.length; ++x) {
-            if (array[x] === object) {
-                return true;
+        // In edit view, load the risk assessment schedules once we've returned from the schedule editor.
+        if (route.params.buildingRiskAssessmentId) {
+            loadBuildingRiskAssessment(route.params.buildingRiskAssessmentId);
+            loadRiskAssessmentSchedules(route.params.buildingRiskAssessmentId);
+        } else {
+            if (route.params.riskAssessmentScheduleIdToFetch) {
+                loadSingleRiskAssessmentSchedule(
+                    route.params.riskAssessmentScheduleIdToFetch,
+                    route.params.index
+                );
             }
         }
-        return false;
-    }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route]);
 
     useEffect(() => {
         setBuildingRiskAssessmentPlayground(
             cloneDeep(buildingRiskAssessmentModel)
         );
         setSelectedBuilding(buildingRiskAssessmentModel.buildingId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [buildingRiskAssessmentModel]);
 
     useEffect(() => {
@@ -247,50 +222,90 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             setIsDirty(true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [buildingRiskAssessmentPlayground, riskAssessmentPlayground]);
+    }, [
+        buildingRiskAssessmentPlayground,
+        riskAssessmentPlayground,
+        riskAssessmentSchedules,
+    ]);
 
     useEffect(() => {
         setBuildingPickerOptions();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [buildings]);
 
-    async function setBuildingRiskAssessment() {
-        let response;
+    async function loadBuildingRiskAssessment(buildingRiskAssessmentId) {
         setLoading(true);
-        try {
-            response = await axios.get(
-                `${BASE_URL}/getBuildingRiskAssessmentById?id=${route.params.buildingRiskAssessmentId}`
-            );
-            if (error) {
-                setError('');
-            }
-        } catch (e) {
-            console.error(e);
-            setError(e.message);
-            setLoading(false);
-            return;
+        const buildingRiskAssessmentResponse = await getBuildingRiskAssessment(
+            buildingRiskAssessmentId
+        );
+        setLoading(false);
+        if (!buildingRiskAssessmentResponse.data) {
+            console.error(buildingRiskAssessmentResponse.error);
+            setError(buildingRiskAssessmentResponse.error.message);
+        } else {
+            setBuildingRiskAssessmentModel(buildingRiskAssessmentResponse.data);
         }
-        setBuildingRiskAssessmentModel(response.data);
     }
 
-    async function setRiskAssessment() {
-        let response;
-        try {
-            setLoading(true);
-            response = await axios.get(
-                `${BASE_URL}/getRiskAssessmentById?id=${route.params.riskAssessmentId}`
-            );
-            if (error) {
-                setError('');
-            }
-        } catch (e) {
-            console.error(e);
-            setError(e.message);
-            setLoading(false);
-        }
+    async function loadSingleRiskAssessmentSchedule(
+        riskAssessmentScheduleId,
+        indexToUpdate
+    ) {
+        setLoading(true);
+        const riskAssessmentScheduleResponse = await getRiskAssessmentSchedule(
+            riskAssessmentScheduleId
+        );
         setLoading(false);
-        const existingRiskAssessment = response.data;
-        setRiskAssessmentModel(existingRiskAssessment);
+        if (!riskAssessmentScheduleResponse.data) {
+            console.error(riskAssessmentScheduleResponse.error);
+            setError(riskAssessmentScheduleResponse.error.message);
+        } else {
+            const newRiskAssessmentSchedule =
+                riskAssessmentScheduleResponse.data;
+            if (
+                !containsObject(
+                    riskAssessmentSchedules,
+                    newRiskAssessmentSchedule
+                )
+            ) {
+                setRiskAssessmentSchedules((prevSchedules) => {
+                    let updatedSchedules;
+                    if (prevSchedules.length > 0) {
+                        if (indexToUpdate || indexToUpdate === 0) {
+                            updatedSchedules = [...prevSchedules];
+                            updatedSchedules[
+                                indexToUpdate
+                            ] = newRiskAssessmentSchedule;
+                        } else {
+                            updatedSchedules = [
+                                ...prevSchedules,
+                                newRiskAssessmentSchedule,
+                            ];
+                        }
+                    } else {
+                        updatedSchedules = [newRiskAssessmentSchedule];
+                    }
+                    return updatedSchedules;
+                });
+            }
+        }
+    }
+
+    async function loadRiskAssessmentSchedules(buildingRiskAssessmentId) {
+        setLoading(true);
+        const riskAssessmentSchedulesResponse = await getRiskAssessmentSchedulesByBuildingRiskAssessmentId(
+            buildingRiskAssessmentId
+        );
+        setLoading(false);
+        if (!riskAssessmentSchedulesResponse.data) {
+            console.error(riskAssessmentSchedulesResponse.error);
+            setError(riskAssessmentSchedulesResponse.error.message);
+        } else {
+            const formattedRiskAssessmentSchedules = formatRiskAssessmentSchedules(
+                riskAssessmentSchedulesResponse.data
+            );
+            setRiskAssessmentSchedules(formattedRiskAssessmentSchedules);
+        }
     }
 
     async function loadRiskAssessments() {
@@ -319,10 +334,45 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         }
     }
 
+    function setBuildingRiskAssessmentPlaygroundRiskAssessmentIds(
+        riskAssessmentId
+    ) {
+        let updatedRiskAssessmentIds = [
+            ...buildingRiskAssessmentPlayground.riskAssessmentIds,
+        ];
+        if (buildingRiskAssessmentPlayground.riskAssessmentIds.length === 0) {
+            updatedRiskAssessmentIds = [riskAssessmentId];
+        } else {
+            if (
+                !buildingRiskAssessmentPlayground.riskAssessmentIds.includes(
+                    riskAssessmentId
+                )
+            ) {
+                updatedRiskAssessmentIds = [
+                    ...buildingRiskAssessmentPlayground.riskAssessmentIds,
+                    riskAssessmentId,
+                ];
+            }
+        }
+        handleBuildingRiskAssessmentPlaygroundChange(
+            'riskAssessmentIds',
+            updatedRiskAssessmentIds
+        );
+    }
+
     function handleRefresh() {
         setRefreshing(true);
         getRiskAssessments();
         setRefreshing(false);
+    }
+
+    function containsObject(array, object) {
+        for (let x = 0; x < array.length; ++x) {
+            if (array[x] === object) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function handleBuildingRiskAssessmentPlaygroundChange(fieldKey, value) {
@@ -333,68 +383,79 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         });
     }
 
-    function handleRiskAssessmentPlaygroundChange(fieldKey, value) {
-        setRiskAssessmentPlayground((prevPlayground) => {
-            const updatedPlayground = { ...prevPlayground };
-            updatedPlayground[fieldKey] = value;
-            return updatedPlayground;
-        });
-    }
-
+    // TODO: After saving the building assessment (confirm that the right risk assessment id's are maintained), make sure to use the attach BRA id to
+    // risk assessment schedules API so that we can search for all RA schedules when this page loads in read/updated mode.
     async function handleSaveBuildingAssessment() {
-        let response;
         let uri;
         let inputObject;
         if (route.params.buildingRiskAssessmentId) {
-            (uri = '/updateBuildingRiskAssessment'),
-                (inputObject = {
-                    id: route.params.buildingRiskAssessmentId,
-                    publisherId: user.id,
-                    riskAssessmentIds:
-                        buildingRiskAssessmentPlayground.riskAssessmentIds,
-                    siteMaintenanceAssociateIds:
-                        riskAssessmentPlayground.siteMaintenanceAssociateIds,
-                    buildingId: buildingRiskAssessmentPlayground.buildingId,
-                    title: buildingRiskAssessmentPlayground.title,
-                    description: buildingRiskAssessmentPlayground.description,
-                    workOrder: riskAssessmentPlayground.workOrder,
-                });
+            uri = '/updateBuildingRiskAssessment';
+            inputObject = {
+                id: route.params.buildingRiskAssessmentId,
+                publisherId: user.id,
+                buildingId: buildingRiskAssessmentPlayground.buildingId,
+                title: buildingRiskAssessmentPlayground.title,
+                description: buildingRiskAssessmentPlayground.description,
+                riskAssessmentIds:
+                    buildingRiskAssessmentPlayground.riskAssessmentIds,
+            };
         } else {
             uri = '/createBuildingRiskAssessment';
             inputObject = {
                 publisherId: user.id,
-                riskAssessmentIds:
-                    buildingRiskAssessmentPlayground.riskAssessmentIds,
-                siteMaintenanceAssociateIds:
-                    riskAssessmentPlayground.siteMaintenanceAssociateIds,
                 buildingId: buildingRiskAssessmentPlayground.buildingId,
                 title: buildingRiskAssessmentPlayground.title,
                 description: buildingRiskAssessmentPlayground.description,
-                workOrder: riskAssessmentPlayground.workOrder,
+                riskAssessmentIds:
+                    buildingRiskAssessmentPlayground.riskAssessmentIds,
             };
         }
         setLoading(true);
-        try {
-            response = await axios.post(`${BASE_URL}/${uri}`, inputObject);
-            if (error) {
-                setError('');
-            }
-        } catch (e) {
-            console.error(e);
-            setError(e.message);
-            setLoading(false);
-            return;
-        }
+        const buildingRiskAssessmentResponse = await saveBuildingRiskAssessment(
+            uri,
+            inputObject
+        );
         setLoading(false);
-        navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
-            buildingRiskAssessmentId: response.data.id,
-            riskAssessmentId:
-                buildingRiskAssessmentPlayground.riskAssessmentIds[0],
-        });
-    }
 
-    function handleDeleteBuildingAssessment() {
-        console.log('Building assessment deleted');
+        if (!buildingRiskAssessmentResponse.data) {
+            console.error(buildingRiskAssessmentResponse.error);
+            setError(buildingRiskAssessmentResponse.error.message);
+        } else {
+            setLoading(true);
+            const attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse = await attachBuildingRiskAssessmentIdToRiskAssessmentSchedules(
+                riskAssessmentSchedules,
+                user.id,
+                buildingRiskAssessmentResponse.data.id
+            );
+            setLoading(false);
+            if (
+                !attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse.data
+            ) {
+                console.error(
+                    attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse.error
+                );
+                setError(
+                    attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse
+                        .error.message
+                );
+            } else {
+                console.log(
+                    attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse.data
+                );
+                navigation.navigate(
+                    navigationRoutes.BUILDINGRISKASSESSMENTEDITOR,
+                    {
+                        buildingRiskAssessmentId:
+                            buildingRiskAssessmentResponse.data.id,
+                    }
+                );
+            }
+        }
+        // navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
+        //     buildingRiskAssessmentId: response.data.id,
+        //     riskAssessmentId:
+        //         buildingRiskAssessmentPlayground.riskAssessmentIds[0],
+        // });
     }
 
     function handleBuildingValueChange(val) {
@@ -445,7 +506,8 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             ) {
                 if (
                     buildingRiskAssessmentPlayground.riskAssessmentIds.length >
-                    0
+                        0 &&
+                    riskAssessmentSchedules.length > 0
                 ) {
                     isValid = true;
                 }
@@ -454,10 +516,78 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         return isValid;
     }
 
+    async function handleRiskAssessmentScheduleCancelPress(index) {
+        const riskAssessmentScheduleToBeDeleted =
+            riskAssessmentSchedules[index];
+        const targetRiskAssessmentId =
+            riskAssessmentScheduleToBeDeleted.riskAssessmentId;
+        let targetRiskAssessmentIds = [];
+        for (let x = 0; x < riskAssessmentSchedules.length; ++x) {
+            if (
+                riskAssessmentSchedules[x].riskAssessmentId ===
+                targetRiskAssessmentId
+            ) {
+                targetRiskAssessmentIds.push(riskAssessmentSchedules[x]);
+            }
+        }
+        // Remove the risk assessment Id from the building risk assessment model
+        if (targetRiskAssessmentIds.length < 2) {
+            let updatedRiskAssessmentIds = [
+                ...buildingRiskAssessmentPlayground.riskAssessmentIds,
+            ];
+            updatedRiskAssessmentIds.splice(
+                updatedRiskAssessmentIds.indexOf((schedule) => {
+                    schedule.riskAssessmentId === targetRiskAssessmentId;
+                }),
+                1
+            );
+            handleBuildingRiskAssessmentPlaygroundChange(
+                'riskAssessmentIds',
+                updatedRiskAssessmentIds
+            );
+        }
+
+        setLoading(true);
+        const deletedRiskAssessmentScheduleResponse = await deleteRiskAssessmentSchedule(
+            riskAssessmentScheduleToBeDeleted.id,
+            user.id
+        );
+        setLoading(false);
+        if (!deletedRiskAssessmentScheduleResponse.data) {
+            console.error(deletedRiskAssessmentScheduleResponse.error);
+            setError(deletedRiskAssessmentScheduleResponse.error.message);
+        } else {
+            console.log(deletedRiskAssessmentScheduleResponse.data);
+            setRiskAssessmentSchedules((prevSchedules) => {
+                let updatedSchedules = [...prevSchedules];
+                updatedSchedules.splice(index, 1);
+                return updatedSchedules;
+            });
+        }
+    }
+
+    function handleRiskAssessmentScheduleEditPress(schedule, index) {
+        navigation.navigate(
+            navigationRoutes.RISKASSESSMENTSCHEDULEEDITORSCREEN,
+            {
+                riskAssessmentScheduleId: schedule.id,
+                riskAssessmentId: schedule.riskAssessmentId,
+                index: index,
+            }
+        );
+    }
+
     function renderRiskAssessmentSchedules() {
-        if (riskAssessmentSchedules && riskAssessmentSchedules.length > 0) {
-            return riskAssessmentSchedules.map((schedule) => {
-                return <RiskAssessmentSchedule schedule={schedule} />;
+        if (riskAssessmentSchedules.length > 0) {
+            return riskAssessmentSchedules.map((schedule, index) => {
+                return (
+                    <RiskAssessmentSchedule
+                        schedule={schedule}
+                        index={index}
+                        cancelPress={handleRiskAssessmentScheduleCancelPress}
+                        editPress={handleRiskAssessmentScheduleEditPress}
+                    />
+                );
             });
         }
     }
@@ -475,29 +605,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         <ScrollView style={styles.container}>
             <View style={styles.splitContainer}>
                 <View style={styles.buttonRow}>
-                    {/* {route.params.buildingRiskAssessmentId ? (
-                        <TouchableOpacity
-                            onPress={handleDeleteBuildingAssessment}
-                            style={
-                                validateBuildingRiskAssessmentPlayground() &&
-                                isDirty
-                                    ? styles.iconButton
-                                    : styles.disabledIconButton
-                            }
-                            disabled={
-                                validateBuildingRiskAssessmentPlayground() &&
-                                isDirty
-                            }>
-                            <Icon
-                                name="trash"
-                                size={22}
-                                style={styles.iconStyle}
-                            />
-                            <Text style={styles.iconButtonText}>
-                                Delete Assessment
-                            </Text>
-                        </TouchableOpacity>
-                    ) : null} */}
                     <TouchableOpacity
                         onPress={handleSaveBuildingAssessment}
                         style={
@@ -574,8 +681,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                 </View>
             </View>
             <View style={styles.container}>
-                {riskAssessmentSchedules &&
-                riskAssessmentSchedules.length > 0 ? (
+                {riskAssessmentSchedules.length > 0 ? (
                     <Text style={styles.infoText}>
                         Building assessment schedules:
                     </Text>
