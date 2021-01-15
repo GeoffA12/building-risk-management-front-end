@@ -71,12 +71,7 @@ export const useUser = () => {
     }
 
     // TODO: Go to the UserForm.js component and make sure we're updating the saveUser function accordingly.
-    async function saveUser(
-        userSites,
-        userId,
-        updateUserInputObject,
-        siteRole
-    ) {
+    async function saveUser(userSites, updateUserInputObject, siteRole) {
         let updatedAssociatedSiteIds = [];
         userSites.map((site) => {
             updatedAssociatedSiteIds.push(site.id);

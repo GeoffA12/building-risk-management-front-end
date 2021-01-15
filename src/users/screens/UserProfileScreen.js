@@ -193,7 +193,6 @@ const UserProfileScreen = ({ navigation }) => {
             setLoading(true);
             const userProfileResponse = await saveUser(
                 userModelPlayground.associatedSiteIds,
-                user.id,
                 updateUserInput,
                 userModelPlayground.siteRole
             );
