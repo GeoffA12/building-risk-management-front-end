@@ -11,6 +11,7 @@ import RiskAssessmentListScreen from '../../riskassessment/screens/RiskAssessmen
 import BuildingRiskAssessmentEditorScreen from '../screens/BuildingRiskAssessmentEditorScreen';
 import RiskAssessmentEditorScreen from '../../riskassessment/screens/RiskAssessmentEditorScreen';
 import RiskAssessmentScheduleEditorScreen from '../screens/RiskAssessmentScheduleEditorScreen';
+import UserProfileScreen from '../../users/screens/UserProfileScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 const SiteMaintenanceManagerDrawer = createDrawerNavigator();
@@ -163,6 +164,10 @@ const SiteMaintenanceManagerNavigator = () => {
             <SiteMaintenanceManagerDrawer.Screen
                 name="Risk assessments"
                 children={createRiskAssessmentStack}
+            />
+            <SiteMaintenanceManagerDrawer.Screen
+                name={navigationRoutes.USERPROFILE}
+                component={UserProfileScreen}
             />
         </SiteMaintenanceManagerDrawer.Navigator>
     );

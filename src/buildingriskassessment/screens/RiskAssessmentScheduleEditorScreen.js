@@ -30,14 +30,10 @@ const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: 6,
         marginVertical: 2,
-        borderWidth: 2,
-        borderColor: 'orange',
     },
     sectionContainer: {
         marginVertical: 4,
         flex: 1,
-        borderWidth: 2,
-        borderColor: 'blue',
     },
     row: {
         flex: 1,
@@ -167,19 +163,35 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         setRiskAssessmentSchedulePlayground(
             cloneDeep(riskAssessmentScheduleModel)
         );
-        setSelectedSiteMaintenanceAssociates(
-            riskAssessmentScheduleModel.siteMaintenanceAssociateIds
-        );
-        setDate(new Date(riskAssessmentScheduleModel.dueDate));
-        setTime(new Date(riskAssessmentScheduleModel.dueDate));
+        if (
+            riskAssessmentScheduleModel.siteMaintenanceAssociateIds &&
+            riskAssessmentScheduleModel.siteMaintenanceAssociateIds.length > 0
+        ) {
+            setSelectedSiteMaintenanceAssociates(
+                riskAssessmentScheduleModel.siteMaintenanceAssociateIds
+            );
+        }
+        if (riskAssessmentScheduleModel.dueDate) {
+            setDate(new Date(riskAssessmentScheduleModel.dueDate));
+            setTime(new Date(riskAssessmentScheduleModel.dueDate));
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [riskAssessmentScheduleModel]);
 
     useEffect(() => {
+        console.log(route.params);
         if (route.params.riskAssessmentId) {
             setRiskAssessmentScheduleModel((prevModel) => {
                 let updatedModel = { ...prevModel };
                 updatedModel.riskAssessmentId = route.params.riskAssessmentId;
+                return updatedModel;
+            });
+        }
+        if (route.params.buildingRiskAssessmentId) {
+            setRiskAssessmentScheduleModel((prevModel) => {
+                let updatedModel = { ...prevModel };
+                updatedModel.buildingRiskAssessmentId =
+                    route.params.buildingRiskAssessmentId;
                 return updatedModel;
             });
         }
@@ -287,6 +299,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                     createRiskAssessmentScheduleResponse.data.id;
             }
         }
+        setLoading(false);
         navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
             buildingRiskAssessmentId: route.params.buildingRiskAssessmentId,
             riskAssessmentId: route.params.riskAssessmentId,
@@ -352,10 +365,6 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             }
             return updatedTitle;
         });
-    }
-
-    function formatDate(dateTimeString) {
-        return new Date(dateTimeString);
     }
 
     return (

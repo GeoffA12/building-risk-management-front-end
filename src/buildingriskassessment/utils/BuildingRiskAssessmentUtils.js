@@ -1,4 +1,5 @@
 import cloneDeep from 'lodash/cloneDeep';
+import { statusEnum } from '../config/StatusEnum';
 
 export const buildingRiskAssessmentUtils = () => {
     function formatDueDate(date, time) {
@@ -35,6 +36,8 @@ export const buildingRiskAssessmentUtils = () => {
             transformedSchedule.dueDate = formatDueDate(
                 new Date(transformedSchedule.dueDate)
             );
+            transformedSchedule.status =
+                statusEnum[transformedSchedule.status].label;
             scheduleContainer.push(transformedSchedule);
         }
         return scheduleContainer;

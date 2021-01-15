@@ -21,6 +21,7 @@ export const useUser = () => {
         username: '',
         associatedSiteIds: '',
         authToken: '',
+        hashPassword: '',
     });
 
     const [userModelPlayground, setUserModelPlayground] = useState(
@@ -69,30 +70,25 @@ export const useUser = () => {
         return smmObject;
     }
 
-    async function saveUser(userPlayground, userSites, userId) {
+    // TODO: Go to the UserForm.js component and make sure we're updating the saveUser function accordingly.
+    async function saveUser(
+        userSites,
+        userId,
+        updateUserInputObject,
+        siteRole
+    ) {
         let updatedAssociatedSiteIds = [];
         userSites.map((site) => {
             updatedAssociatedSiteIds.push(site.id);
         });
-        const siteRoleURLValue =
-            SiteRoles[userModelPlayground.siteRole].urlValue;
+        const siteRoleURLValue = SiteRoles[siteRole].urlValue;
         let updatedUser;
         const userObject = { ...responseObject };
         try {
             updatedUser = await loadData(
                 `${BASE_URL}/update${siteRoleURLValue}`,
                 'POST',
-                {
-                    id: userPlayground.id,
-                    username: userPlayground.username,
-                    siteRole: userPlayground.siteRole,
-                    firstName: userPlayground.firstName,
-                    lastName: userPlayground.lastName,
-                    email: userPlayground.email,
-                    phone: userPlayground.phone,
-                    siteIds: updatedAssociatedSiteIds,
-                    userId: userId,
-                }
+                updateUserInputObject
             );
             userObject.data = updatedUser;
         } catch (e) {
@@ -141,6 +137,39 @@ export const useUser = () => {
         return userPageObject;
     }
 
+    async function authenticateUserPassword(userId, password) {
+        let authenticateUserPasswordData;
+        let authenticateUserPasswordResponse = { ...responseObject };
+        try {
+            authenticateUserPasswordData = await loadData(
+                `${BASE_URL}/authenticateUserPassword`,
+                'POST',
+                {
+                    userId: userId,
+                    password: password,
+                }
+            );
+            authenticateUserPasswordResponse.data = authenticateUserPasswordData;
+        } catch (e) {
+            authenticateUserPasswordResponse.error = e;
+        }
+        return authenticateUserPasswordResponse;
+    }
+
+    async function getUserSites(associatedSiteIds) {
+        let userSites;
+        let userSitesResponse = { ...responseObject };
+        try {
+            userSites = await loadData(`${BASE_URL}/getSites`, 'POST', {
+                siteIds: associatedSiteIds,
+            });
+            userSitesResponse.data = userSites;
+        } catch (e) {
+            userSitesResponse.error = e;
+        }
+        return userSitesResponse;
+    }
+
     return {
         userModel,
         setUserModel,
@@ -152,5 +181,7 @@ export const useUser = () => {
         saveUser,
         deleteUser,
         getUsers,
+        authenticateUserPassword,
+        getUserSites,
     };
 };
