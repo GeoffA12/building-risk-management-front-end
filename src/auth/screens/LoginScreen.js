@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
 import Heading from '../../common/components/Heading';
 import FormInput from '../../common/components/FormInput';
 import StyledButton from '../../common/components/StyledButton';
@@ -9,16 +9,14 @@ import { navigationRoutes } from '../../config/NavConfig';
 import AuthContext from '../contexts/AuthContext';
 import Loading from '../../common/components/Loading';
 import Confirmation from '../../common/components/Confirmation';
-import { DARK_BLUE, DISABLED_BUTTON } from '../../common/styles/Colors';
+import { DARK_BLUE } from '../../common/styles/Colors';
+import { Platform } from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
         marginTop: 15,
-    },
-    input: {
-        marginVertical: 12,
     },
     loginButton: {
         marginVertical: 12,
@@ -36,6 +34,24 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '500',
     },
+    row: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+    },
+    inputRow: {
+        flex: 0.3,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    confirmationRow: {
+        flex: 0.5,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 
 const LoginScreen = ({ navigation, route }) => {
@@ -48,6 +64,13 @@ const LoginScreen = ({ navigation, route }) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showConfirmation, setShowConfirmation] = useState(false);
+
+    useEffect(() => {
+        if (route.params && route.params.isRegistered) {
+            setShowConfirmation(true);
+        }
+    }, [route]);
 
     async function handleLoginPress() {
         try {
@@ -61,48 +84,63 @@ const LoginScreen = ({ navigation, route }) => {
         }
     }
 
-    function checkRegistered() {
-        const { isRegistered } = route.params;
-        return isRegistered;
+    function handleConfirmationClose() {
+        if (showConfirmation === true) {
+            setShowConfirmation((prevShowConfirmation) => {
+                return !prevShowConfirmation;
+            });
+        }
     }
 
     return (
         <AuthContainer>
-            {route.params && checkRegistered() ? (
-                <Confirmation
-                    title={'Login successful!'}
-                    message={'You may now login.'}
-                    showConfirmation={true}
-                />
+            {showConfirmation ? (
+                <View style={styles.confirmationRow}>
+                    <Confirmation
+                        title="Successfully registered!"
+                        message="You may now login."
+                        handleConfirmationClose={handleConfirmationClose}
+                    />
+                </View>
             ) : null}
-            <Heading>Login!</Heading>
+            <View style={styles.confirmationRow}>
+                <Heading>Login!</Heading>
+            </View>
             <Error errorMessage={error} />
-            <FormInput
-                style={styles.input}
-                placeholder={'Username'}
-                onChangeText={setUsername}
-                value={username}
-            />
-            <FormInput
-                style={styles.input}
-                placeholder={'Password'}
-                secureTextEntry
-                onChangeText={setPassword}
-                value={password}
-            />
-            <StyledButton
-                title={'Login'}
-                style={styles.loginButton}
-                onPress={handleLoginPress}
-            />
-            <StyledButton
-                title={"Don't have an account? Create one here!"}
-                style={styles.createAccountButton}
-                textStyle={styles.createAccountText}
-                onPress={() =>
-                    navigation.navigate(navigationRoutes.REGISTRATION)
-                }
-            />
+            <View style={styles.inputRow}>
+                <FormInput
+                    style={styles.input}
+                    placeholder={'Username'}
+                    onChangeText={setUsername}
+                    value={username}
+                />
+            </View>
+            <View style={styles.inputRow}>
+                <FormInput
+                    style={styles.input}
+                    placeholder={'Password'}
+                    secureTextEntry
+                    onChangeText={setPassword}
+                    value={password}
+                />
+            </View>
+            <View style={styles.inputRow}>
+                <StyledButton
+                    title={'Login'}
+                    style={styles.loginButton}
+                    onPress={handleLoginPress}
+                />
+            </View>
+            <View style={styles.row}>
+                <StyledButton
+                    title={"Don't have an account? Create one here!"}
+                    style={styles.createAccountButton}
+                    textStyle={styles.createAccountText}
+                    onPress={() =>
+                        navigation.navigate(navigationRoutes.REGISTRATION)
+                    }
+                />
+            </View>
             <Loading loading={loading} />
         </AuthContainer>
     );

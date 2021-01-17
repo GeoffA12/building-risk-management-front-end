@@ -31,6 +31,7 @@ import {
     DISABLED_BUTTON,
 } from '../../common/styles/Colors';
 import { navigationRoutes } from '../../config/NavConfig';
+import { DatePickerAndroid } from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
@@ -135,14 +136,16 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     const { riskAssessmentModel, getRiskAssessments } = useRiskAssessment();
     const {
         getRiskAssessmentSchedulesByBuildingRiskAssessmentId,
-        getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding,
         getRiskAssessmentSchedule,
         deleteRiskAssessmentSchedule,
         attachBuildingRiskAssessmentIdToRiskAssessmentSchedules,
     } = useRiskAssessmentSchedule();
     const { error, setError, loading, setLoading } = useAPI();
 
-    const { formatRiskAssessmentSchedules } = buildingRiskAssessmentUtils();
+    const {
+        formatRiskAssessmentSchedules,
+        formatDueDate,
+    } = buildingRiskAssessmentUtils();
 
     const [
         buildingRiskAssessmentPlayground,
@@ -154,6 +157,10 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     );
 
     const [riskAssessmentSchedules, setRiskAssessmentSchedules] = useState([]);
+    const [
+        transformedRiskAssessmentSchedules,
+        setTransformedRiskAssessmentSchedules,
+    ] = useState([]);
 
     const [riskAssessments, setRiskAssessments] = useState([]);
 
@@ -175,7 +182,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     // Can receive an index, riskAssessmentSchedule, or riskAssessmentId as a route parameter.
 
     useEffect(() => {
-        console.log(route);
         if (route.params.riskAssessmentId) {
             setBuildingRiskAssessmentPlaygroundRiskAssessmentIds(
                 route.params.riskAssessmentId
@@ -222,11 +228,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             setIsDirty(true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        buildingRiskAssessmentPlayground,
-        riskAssessmentPlayground,
-        riskAssessmentSchedules,
-    ]);
+    }, [riskAssessmentPlayground, riskAssessmentSchedules]);
 
     useEffect(() => {
         setBuildingPickerOptions();
@@ -246,6 +248,17 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             setBuildingRiskAssessmentModel(buildingRiskAssessmentResponse.data);
         }
     }
+
+    useEffect(() => {
+        let formattedSchedules = [];
+        if (riskAssessmentSchedules.length > 0) {
+            formattedSchedules = formatRiskAssessmentSchedules(
+                riskAssessmentSchedules
+            );
+        }
+        setTransformedRiskAssessmentSchedules(formattedSchedules);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [riskAssessmentSchedules]);
 
     async function loadSingleRiskAssessmentSchedule(
         riskAssessmentScheduleId,
@@ -301,10 +314,8 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             console.error(riskAssessmentSchedulesResponse.error);
             setError(riskAssessmentSchedulesResponse.error.message);
         } else {
-            const formattedRiskAssessmentSchedules = formatRiskAssessmentSchedules(
-                riskAssessmentSchedulesResponse.data
-            );
-            setRiskAssessmentSchedules(formattedRiskAssessmentSchedules);
+            console.log(riskAssessmentSchedulesResponse.data);
+            setRiskAssessmentSchedules(riskAssessmentSchedulesResponse.data);
         }
     }
 
@@ -422,6 +433,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             setError(buildingRiskAssessmentResponse.error.message);
         } else {
             setLoading(true);
+            console.log(riskAssessmentSchedules);
             const attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse = await attachBuildingRiskAssessmentIdToRiskAssessmentSchedules(
                 riskAssessmentSchedules,
                 user.id,
@@ -451,11 +463,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                 );
             }
         }
-        // navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
-        //     buildingRiskAssessmentId: response.data.id,
-        //     riskAssessmentId:
-        //         buildingRiskAssessmentPlayground.riskAssessmentIds[0],
-        // });
     }
 
     function handleBuildingValueChange(val) {
@@ -491,9 +498,12 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             navigationRoutes.RISKASSESSMENTSCHEDULEEDITORSCREEN,
             {
                 riskAssessmentId: assessment.id,
+                buildingRiskAssessmentId: route.params.buildingRiskAssessmentId,
             }
         );
     }
+
+    console.log(riskAssessmentSchedules);
 
     function validateBuildingRiskAssessmentPlayground() {
         let isValid = false;
@@ -573,13 +583,14 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                 riskAssessmentScheduleId: schedule.id,
                 riskAssessmentId: schedule.riskAssessmentId,
                 index: index,
+                buildingRiskAssessmentId: route.params.buildingRiskAssessmentId,
             }
         );
     }
 
     function renderRiskAssessmentSchedules() {
-        if (riskAssessmentSchedules.length > 0) {
-            return riskAssessmentSchedules.map((schedule, index) => {
+        if (transformedRiskAssessmentSchedules.length > 0) {
+            return transformedRiskAssessmentSchedules.map((schedule, index) => {
                 return (
                     <RiskAssessmentSchedule
                         schedule={schedule}

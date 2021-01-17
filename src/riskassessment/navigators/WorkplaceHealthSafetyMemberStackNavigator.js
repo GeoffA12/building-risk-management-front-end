@@ -5,7 +5,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { navigationRoutes } from '../../config/NavConfig';
 import RiskAssessmentListScreen from '../screens/RiskAssessmentListScreen';
 import RiskAssessmentEditorScreen from '../screens/RiskAssessmentEditorScreen';
-import RiskAssessmentProfile from '../components/RiskAssessmentProfile';
+import UserProfileScreen from '../../users/screens/UserProfileScreen';
 
 const WorkplaceHealthSafetyMemberStack = createStackNavigator();
 const WorkplaceHealthSafetyMemberDrawer = createDrawerNavigator();
@@ -41,8 +41,8 @@ const WorkplaceHealthSafetyMemberStackNavigator = () => {
                 children={createRiskAssessmentStack}
             />
             <WorkplaceHealthSafetyMemberDrawer.Screen
-                name="User Profile"
-                component={RiskAssessmentProfile}
+                name={navigationRoutes.USERPROFILE}
+                component={UserProfileScreen}
             />
         </WorkplaceHealthSafetyMemberDrawer.Navigator>
     );

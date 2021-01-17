@@ -11,4 +11,5 @@ export const navigationRoutes = {
     BUILDINGRISKASSESSMENTLIST: 'BuildingRiskAssessmentList',
     BUILDINGRISKASSESSMENTEDITOR: 'BuildingRiskAssessmentEditor',
     RISKASSESSMENTSCHEDULEEDITORSCREEN: 'RiskAssessmentScheduleEditorScreen',
+    USERPROFILE: 'User Profile',
 };
