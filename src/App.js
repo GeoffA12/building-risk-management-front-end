@@ -6,6 +6,7 @@ import AuthStackNavigator from './auth/navigators/AuthStackNavigator';
 import SiteAdminStackNavigator from './users/navigators/SiteAdminStackNavigator';
 import WorkplaceHealthSafetyMemberStackNavigator from './riskassessment/navigators/WorkplaceHealthSafetyMemberStackNavigator';
 import SiteMaintenanceManagerNavigator from './buildingriskassessment/navigators/SiteMaintenanceManagerNavigator';
+import SiteMaintenanceAssociateStackNavigator from './riskassessmentcalendar/navigators/SiteMaintenanceAssociateStackNavigator';
 import SplashScreen from './auth/screens/SplashScreen';
 import AuthContext from './auth/contexts/AuthContext';
 import { navigationRoutes } from './config/NavConfig';
@@ -35,6 +36,12 @@ const App = () => {
                 return (
                     <RootStack.Screen name={'SiteMaintenanceManagerStack'}>
                         {() => <SiteMaintenanceManagerNavigator />}
+                    </RootStack.Screen>
+                );
+            case SiteRoles.SITEMAINTENANCEASSC.apiEnumValue:
+                return (
+                    <RootStack.Screen name={'SiteMaintenanceAssociateStack'}>
+                        {() => <SiteMaintenanceAssociateStackNavigator />}
                     </RootStack.Screen>
                 );
             default:
