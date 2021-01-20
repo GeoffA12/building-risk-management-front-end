@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Card } from 'react-native-elements';
+import { StyleSheet, View, Text } from 'react-native';
 import PropTypes from 'prop-types';
 import { CONFIRMATION_GREEN } from '../styles/Colors';
 import IconButton from './IconButton';
 
 const styles = StyleSheet.create({
-    containerStyle: {
+    container: {
         borderRadius: 4,
         borderColor: 'black',
         borderWidth: 1,
         backgroundColor: `${CONFIRMATION_GREEN}`,
-        width: 300,
+        flex: 1,
+        margin: 2,
     },
-    wrapperStyle: {
-        padding: 1,
-        margin: 1,
+    row: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 4,
+        marginVertical: 2,
     },
     cardMessageText: {
         fontSize: 13,
@@ -35,41 +39,37 @@ const styles = StyleSheet.create({
     },
 });
 
-const Confirmation = ({ title, message, showConfirmation }) => {
-    const [toggleConfirmation, setToggleConfirmation] = useState(
-        showConfirmation
+const Confirmation = ({
+    title,
+    message,
+    handleConfirmationClose,
+    containerStyle,
+}) => {
+    return (
+        <View style={[styles.container, containerStyle]}>
+            <View style={styles.row}>
+                <Text style={styles.cardTitleText}>{title}</Text>
+            </View>
+            <View style={styles.row}>
+                <Text style={styles.cardMessageText}>{message}</Text>
+            </View>
+            <View style={styles.row}>
+                <IconButton
+                    onPress={() => handleConfirmationClose()}
+                    name={'close-circle'}
+                    style={styles.iconStyle}
+                    iconSize={25}
+                />
+            </View>
+        </View>
     );
-
-    function handleConfirmationClose() {
-        setToggleConfirmation((prevToggleConfirmation) => {
-            return !prevToggleConfirmation;
-        });
-    }
-
-    return toggleConfirmation ? (
-        <Card
-            containerStyle={styles.containerStyle}
-            wrapperStyle={styles.wrapperStyle}>
-            <Card.Title style={styles.cardTitleText}>{title}</Card.Title>
-            <Card.Divider />
-            <Card.FeaturedSubtitle style={styles.cardMessageText}>
-                {message}
-            </Card.FeaturedSubtitle>
-
-            <IconButton
-                onPress={handleConfirmationClose}
-                name={'close-circle'}
-                style={styles.iconStyle}
-                iconSize={25}
-            />
-        </Card>
-    ) : null;
 };
 
 Confirmation.propTypes = {
     title: PropTypes.string.isRequired,
     message: PropTypes.string.isRequired,
-    showConfirmation: PropTypes.bool.isRequired,
+    handleConfirmationClose: PropTypes.func.isRequired,
+    containerStyle: PropTypes.object,
 };
 
 export default Confirmation;

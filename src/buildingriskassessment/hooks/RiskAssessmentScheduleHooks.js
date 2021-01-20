@@ -2,7 +2,7 @@ import { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import { useAPI } from '../../common/hooks/API';
 import { riskLevelEnum } from '../config/RiskLevelEnum';
-import { statusEnum } from '../config/StatusEnum';
+import { statusEnum, getUrlValueFromLabel } from '../config/StatusEnum';
 import { BASE_URL } from '../../config/APIConfig';
 
 export const useRiskAssessmentSchedule = () => {

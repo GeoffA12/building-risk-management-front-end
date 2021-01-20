@@ -286,10 +286,22 @@ const UserForm = ({ navigation, formTitle, userId, handleExitFormPress }) => {
 
     async function handleSaveUser() {
         setLoading(true);
+        let updateUserInput = {
+            id: userModelPlayground.id,
+            userId: user.id,
+            firstName: userModelPlayground.firstName,
+            lastName: userModelPlayground.lastName,
+            username: userModelPlayground.username,
+            email: userModelPlayground.email,
+            phone: userModelPlayground.phone,
+            siteIds: userModelPlayground.associatedSiteIds,
+            password: null,
+        };
+
         const savedUser = await saveUser(
-            userModelPlayground,
             userSites,
-            user.id
+            updateUserInput,
+            userModelPlayground.siteRole
         );
 
         if (!savedUser.data) {
