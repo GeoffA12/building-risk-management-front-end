@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+    Text,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import Icon from 'react-native-ionicons';
+import cloneDeep from 'lodash/cloneDeep';
 import IconButton from '../../common/components/IconButton';
 import Heading from '../../common/components/Heading';
 import EnhancedPicker from '../../common/components/EnhancedPicker';
@@ -10,45 +17,39 @@ import {
     riskCategoryPickerOptions,
     riskImpactPickerOptions,
 } from '../config/PickerOptions';
+import { useHazard } from '../../riskassessmentcalendar/hooks/HazardHooks';
 import { DARK_BLUE, LIGHT_GRAY } from '../../common/styles/Colors';
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginVertical: 4,
-        marginHorizontal: 4,
-        alignItems: 'center',
-    },
-    closeIcon: {
-        position: 'absolute',
-        top: 23,
-        right: 22,
+        marginVertical: 3,
+        marginHorizontal: 6,
     },
     heading: {
-        marginVertical: 12,
-        padding: 2,
-        fontSize: 34,
+        fontSize: 32,
         fontWeight: '700',
         color: `${DARK_BLUE}`,
     },
-    hazardInputRow: {
+    row: {
         flex: 1,
-        marginVertical: 40,
+        marginVertical: 5,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
     },
     pickerRowContainer: {
-        marginVertical: 40,
         width: '60%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        margin: 4,
     },
-    hazardInputCell: {
+    cell: {
         flex: 1,
-        margin: 3,
-        padding: 3,
+        flexDirection: 'column',
+        margin: 2,
+        padding: 2,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -56,6 +57,7 @@ const styles = StyleSheet.create({
         backgroundColor: `${DARK_BLUE}`,
         borderRadius: 8,
         color: `${LIGHT_GRAY}`,
+        marginBottom: 2,
     },
     picker: {
         width: '95%',
@@ -63,18 +65,25 @@ const styles = StyleSheet.create({
     },
     iconButton: {
         backgroundColor: `${DARK_BLUE}`,
-        marginTop: 40,
         borderRadius: 10,
         flexDirection: 'row',
         alignItems: 'stretch',
-        padding: 7,
-        width: '60%',
+        padding: 5,
+        width: '30%',
     },
     iconButtonText: {
         color: `${LIGHT_GRAY}`,
         fontSize: 16,
         paddingHorizontal: 15,
         paddingVertical: 3,
+    },
+    labelText: {
+        fontSize: 18,
+        fontWeight: '500',
+        textAlign: 'center',
+        padding: 4,
+        margin: 2,
+        color: `${DARK_BLUE}`,
     },
     iconStyle: {
         color: `${LIGHT_GRAY}`,
@@ -85,25 +94,44 @@ const styles = StyleSheet.create({
 
 const HazardEditor = ({
     leaveHazardEditorPress,
-    isRiskAssessmentView,
+    isMaintenanceView,
     handleOnSavePress,
     hazardDetails,
     index,
 }) => {
-    const [description, setDescription] = useState('');
-    const [riskCategory, setRiskCategory] = useState('0');
-    const [riskImpact, setRiskImpact] = useState('0');
-    const [directions, setDirections] = useState('');
+    const {
+        hazardModel,
+        setHazardModel,
+        hazardPlayground,
+        setHazardPlayground,
+    } = useHazard();
+
+    const [hazardFormTitle, setHazardFormTitle] = useState('');
 
     useEffect(() => {
         if (hazardDetails) {
-            setDescription(hazardDetails.description);
-            setRiskCategory(hazardDetails.riskCategory);
-            setRiskImpact(hazardDetails.riskImpact);
-            setDirections(hazardDetails.directions);
+            setHazardModel(cloneDeep(hazardDetails));
+        }
+        if (isMaintenanceView || hazardDetails.description) {
+            setHazardFormTitle('Edit hazard!');
+        } else {
+            setHazardFormTitle('Add hazard!');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        setHazardPlayground(cloneDeep(hazardModel));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hazardModel]);
+
+    function handleHazardPlaygroundChange(fieldKey, value) {
+        setHazardPlayground((prevPlayground) => {
+            let updatedPlayground = { ...prevPlayground };
+            updatedPlayground[fieldKey] = value;
+            return updatedPlayground;
+        });
+    }
 
     function setPickerOptions(optionsObject) {
         let options = [];
@@ -113,102 +141,123 @@ const HazardEditor = ({
         return options;
     }
 
-    function handleDescriptionChange(val) {
-        setDescription(val);
-    }
-
-    function handleRiskCategoryChange(val) {
-        setRiskCategory(val);
-    }
-
-    function handleRiskImpactChange(val) {
-        setRiskImpact(val);
-    }
-
-    function handleDirectionsChange(val) {
-        setDirections(val);
-    }
-
     return (
-        <View style={styles.container}>
-            <IconButton
-                name={'close-circle'}
-                style={styles.closeIcon}
-                iconSize={30}
-                onPress={leaveHazardEditorPress}
-            />
-            <Heading style={styles.heading}>Add New Hazard!</Heading>
-            <View style={styles.hazardInputRow}>
-                <View style={styles.hazardInputCell}>
+        <ScrollView style={styles.container}>
+            <View style={styles.row}>
+                <View style={styles.cell}>
+                    <Heading style={styles.heading}>{hazardFormTitle}</Heading>
+                    <IconButton
+                        name={'close-circle'}
+                        style={styles.closeIcon}
+                        iconSize={30}
+                        onPress={leaveHazardEditorPress}
+                    />
+                </View>
+            </View>
+
+            <View style={styles.row}>
+                <View style={styles.cell}>
+                    <Text style={styles.labelText}>Description:</Text>
                     <FormInput
                         style={styles.inputStyle}
                         placeholder={'Description'}
                         placeholderTextColor={`${LIGHT_GRAY}`}
-                        onChangeText={handleDescriptionChange}
-                        value={description}
+                        onChangeText={(val) =>
+                            handleHazardPlaygroundChange('description', val)
+                        }
+                        value={hazardPlayground.description}
+                        multiline={true}
+                        editable={!isMaintenanceView}
                     />
                 </View>
             </View>
-            <View style={styles.hazardInputRow}>
-                <View style={styles.hazardInputCell}>
+            <View style={styles.row}>
+                <View style={styles.cell}>
+                    <Text style={styles.labelText}>Directions:</Text>
                     <FormInput
                         style={styles.inputStyle}
                         placeholder={'Directions'}
                         placeholderTextColor={`${LIGHT_GRAY}`}
-                        onChangeText={handleDirectionsChange}
-                        value={directions}
+                        onChangeText={(val) =>
+                            handleHazardPlaygroundChange('directions', val)
+                        }
+                        value={hazardPlayground.directions}
                         multiline={true}
+                        editable={!isMaintenanceView}
                     />
                 </View>
             </View>
-            <View style={styles.pickerRowContainer}>
-                <EnhancedPicker
-                    onChange={handleRiskCategoryChange}
-                    currentRoleSelected={riskCategory}
-                    pickerOptions={setPickerOptions(riskCategoryPickerOptions)}
-                    prompt={'Select risk catgory'}
-                    style={styles.picker}
-                />
+            <View style={styles.row}>
+                <View style={styles.pickerRowContainer}>
+                    <EnhancedPicker
+                        onChange={(val) =>
+                            handleHazardPlaygroundChange('riskCategory', val)
+                        }
+                        currentRoleSelected={hazardPlayground.riskCategory}
+                        pickerOptions={setPickerOptions(
+                            riskCategoryPickerOptions
+                        )}
+                        prompt={'Select risk catgory'}
+                        style={styles.picker}
+                        enabled={!isMaintenanceView}
+                    />
+                </View>
             </View>
-            <View style={styles.pickerRowContainer}>
-                <EnhancedPicker
-                    onChange={handleRiskImpactChange}
-                    currentRoleSelected={riskImpact}
-                    pickerOptions={setPickerOptions(riskImpactPickerOptions)}
-                    prompt={'Select risk impact'}
-                    style={styles.picker}
-                />
+            <View style={styles.row}>
+                <View style={styles.pickerRowContainer}>
+                    <EnhancedPicker
+                        onChange={(val) =>
+                            handleHazardPlaygroundChange('riskImpact', val)
+                        }
+                        currentRoleSelected={hazardPlayground.riskImpact}
+                        pickerOptions={setPickerOptions(
+                            riskImpactPickerOptions
+                        )}
+                        prompt={'Select risk impact'}
+                        style={styles.picker}
+                        enabled={!isMaintenanceView}
+                    />
+                </View>
             </View>
-            <View style={styles.pickerRowContainer}>
+            {isMaintenanceView ? (
+                <View style={styles.row}>
+                    <View style={styles.cell}>
+                        <Text style={styles.labelText}>Comments:</Text>
+                        <FormInput
+                            style={styles.inputStyle}
+                            placeholder={'Comments'}
+                            placeholderTextColor={`${LIGHT_GRAY}`}
+                            onChangeText={(val) =>
+                                handleHazardPlaygroundChange('comments', val)
+                            }
+                            value={hazardPlayground.comments}
+                            multiline={true}
+                        />
+                    </View>
+                </View>
+            ) : null}
+            <View style={styles.row}>
                 <TouchableOpacity
-                    onPress={() =>
-                        handleOnSavePress(
-                            description,
-                            directions,
-                            riskCategory,
-                            riskImpact,
-                            index
-                        )
-                    }
+                    onPress={() => handleOnSavePress(hazardPlayground, index)}
                     style={styles.iconButton}>
                     <Icon name="save" size={22} style={styles.iconStyle} />
                     <Text style={styles.iconButtonText}>Save</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
 HazardEditor.propTypes = {
     leaveHazardEditorPress: PropTypes.func.isRequired,
-    isRiskAssessmentView: PropTypes.bool.isRequired,
+    isMaintenanceView: PropTypes.bool,
     handleOnSavePress: PropTypes.func.isRequired,
-    hazardDetails: PropTypes.object,
+    hazardDetails: PropTypes.object.isRequired,
     index: PropTypes.number,
 };
 
 HazardEditor.defaultProps = {
-    hazardDetails: {},
+    isMaintenanceView: false,
     index: -1,
 };
 
