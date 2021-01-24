@@ -3,7 +3,7 @@ export const convertUTCDateToLocalDate = (dateString) => {
 
     let offset = date.getTimezoneOffset() * 60000;
 
-    date.setTime(date.getTime() - offset);
+    // date.setTime(date.getTime() - offset);
 
     let militaryHours = date.getHours();
     let localHours = militaryHours;
