@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 import AuthStackNavigator from './auth/navigators/AuthStackNavigator';
 import SiteAdminStackNavigator from './users/navigators/SiteAdminStackNavigator';
@@ -76,15 +77,17 @@ const App = () => {
 
     return (
         <AuthContext.Provider value={{ auth, user: state.user }}>
-            <NavigationContainer>
-                <RootStack.Navigator
-                    screenOptions={{
-                        headerShown: false,
-                        animationEnabled: false,
-                    }}>
-                    {renderScreens()}
-                </RootStack.Navigator>
-            </NavigationContainer>
+            <PaperProvider>
+                <NavigationContainer>
+                    <RootStack.Navigator
+                        screenOptions={{
+                            headerShown: false,
+                            animationEnabled: false,
+                        }}>
+                        {renderScreens()}
+                    </RootStack.Navigator>
+                </NavigationContainer>
+            </PaperProvider>
         </AuthContext.Provider>
     );
 };

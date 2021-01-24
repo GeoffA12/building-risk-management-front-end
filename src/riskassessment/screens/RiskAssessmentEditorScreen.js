@@ -19,6 +19,7 @@ import Hazard from '../components/Hazard';
 import Screener from '../components/Screener';
 import { navigationRoutes } from '../../config/NavConfig';
 import { useRiskAssessment } from '../hooks/RiskAssessmentHooks';
+import { useHazard } from '../../riskassessmentcalendar/hooks/HazardHooks';
 import { useAPI } from '../../common/hooks/API';
 import {
     LIGHT_TEAL,
@@ -118,9 +119,10 @@ const RiskAssessmentEditorScreen = ({
     } = useRiskAssessment();
 
     const [hazardIndex, setHazardIndex] = useState(-1);
-    const [hazardDetails, setHazardDetails] = useState({});
     const [isDirty, setIsDirty] = useState(true);
     const [hasDeletePermissions, setHasDeletePermissions] = useState(false);
+    const { hazardModel } = useHazard();
+    const [hazardDetails, setHazardDetails] = useState({ ...hazardModel });
 
     useEffect(() => {
         if (route && route.params && route.params.riskAssessmentId) {
@@ -250,18 +252,12 @@ const RiskAssessmentEditorScreen = ({
         setModalOpen(false);
     }
 
-    function handleSaveHazardPress(
-        description,
-        directions,
-        riskCategory,
-        riskImpact,
-        index
-    ) {
+    function handleSaveHazardPress(playground, index) {
         const newHazard = {
-            description,
-            directions,
-            riskCategory,
-            riskImpact,
+            description: playground.description,
+            directions: playground.directions,
+            riskCategory: playground.riskCategory,
+            riskImpact: playground.riskImpact,
         };
         setRiskAssessmentPlayground((prevPlayground) => {
             const updatedPlayground = { ...prevPlayground };
@@ -347,15 +343,13 @@ const RiskAssessmentEditorScreen = ({
     return (
         <ScrollView style={styles.container}>
             <Modal visible={modalOpen} animationType={'slide'}>
-                <View>
-                    <HazardEditor
-                        leaveHazardEditorPress={handleLeaveHazardEditorPress}
-                        isRiskAssessmentView={false}
-                        handleOnSavePress={handleSaveHazardPress}
-                        hazardDetails={hazardDetails}
-                        index={hazardIndex}
-                    />
-                </View>
+                <HazardEditor
+                    leaveHazardEditorPress={handleLeaveHazardEditorPress}
+                    isMaintenanceView={false}
+                    handleOnSavePress={handleSaveHazardPress}
+                    hazardDetails={hazardDetails}
+                    index={hazardIndex}
+                />
             </Modal>
             {riskAssessmentPlayground.entityTrail &&
             riskAssessmentPlayground.entityTrail.length >= 1 ? (

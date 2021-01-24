@@ -33,6 +33,7 @@ const EnhancedPicker = ({
     pickerOptions,
     prompt,
     style,
+    enabled,
 }) => {
     return (
         <View style={styles.container}>
@@ -41,6 +42,7 @@ const EnhancedPicker = ({
                 onValueChange={onChange}
                 selectedValue={currentRoleSelected}
                 prompt={prompt}
+                enabled={enabled}
                 itemStyle={styles.itemStyle}>
                 {pickerOptions && pickerOptions.length > 0
                     ? pickerOptions.map((option) => {
@@ -68,12 +70,14 @@ EnhancedPicker.propTypes = {
     pickerOptions: PropTypes.array,
     prompt: PropTypes.string,
     style: PropTypes.object,
+    enabled: PropTypes.bool,
 };
 
 EnhancedPicker.defaultProps = {
     pickerOptions: [],
     prompt: '',
     style: styles.container,
+    enabled: true,
 };
 
 export default EnhancedPicker;

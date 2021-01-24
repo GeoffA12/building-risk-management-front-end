@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 12,
         marginBottom: 4,
         width: '70%',
-        padding: 2,
+        padding: 1,
         backgroundColor: `${DARK_BLUE}`,
         color: `${LIGHT_GRAY}`,
     },
@@ -421,6 +421,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                         val
                                     )
                                 }
+                                multiline
                             />
                         </View>
                         <View style={styles.multiSelectRow}>

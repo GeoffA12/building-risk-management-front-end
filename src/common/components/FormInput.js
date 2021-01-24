@@ -12,22 +12,19 @@ const styles = StyleSheet.create({
 });
 
 const FormInput = ({ style, ...props }) => {
-    const defaultLineHeight = 42;
-    const [formLineHeight, setFormLineHeight] = useState(defaultLineHeight);
+    // const defaultLineHeight = 42;
+    // const [formLineHeight, setFormLineHeight] = useState(defaultLineHeight);
 
-    function handleFormLineHeightChange(event) {
-        setFormLineHeight(event.nativeEvent.contentSize.height);
-    }
+    // function handleFormLineHeightChange(event) {
+    //     console.log(event.nativeEvent);
+    //     setFormLineHeight(event.nativeEvent.contentSize.height);
+    // }
 
     return (
         <TextInput
             {...props}
-            style={[
-                styles.input,
-                style,
-                { height: Math.max(defaultLineHeight, formLineHeight) },
-            ]}
-            onContentSizeChange={handleFormLineHeightChange}
+            style={[styles.input, style]}
+            // onChange={(e) => handleFormLineHeightChange(e)}
         />
     );
 };

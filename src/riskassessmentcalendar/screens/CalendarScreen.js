@@ -1,10 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, LogBox } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import { Card } from 'react-native-paper';
 import AuthContext from '../../auth/contexts/AuthContext';
 import { useHeader } from '../hooks/CalendarHeader';
 import { BASE_URL } from '../../config/APIConfig';
+import { navigationRoutes } from '../../config/NavConfig';
 
 const styles = StyleSheet.create({
     container: {
@@ -35,7 +36,7 @@ const CalendarScreen = ({ navigation }) => {
         riskAssessmentScheduleList,
         setRiskAssessmentScheduleList,
     ] = useState([]);
-    const [itemsList, setItemsListForAgenda] = useState([]);
+    const [itemsList, setItemsListForAgenda] = useState({});
     const today = new Date().toISOString().slice(0, 10);
 
     useEffect(() => {
@@ -83,7 +84,8 @@ const CalendarScreen = ({ navigation }) => {
     useEffect(() => {
         async function formatRiskAssessmentSchedules() {
             const items = {};
-            for (const schedule of riskAssessmentScheduleList) {
+            for (let x = 0; x < riskAssessmentScheduleList.length; ++x) {
+                const schedule = riskAssessmentScheduleList[x];
                 items[schedule.dueDate.slice(0, 10)] = [
                     { name: schedule.title, id: schedule.id },
                 ];
@@ -93,9 +95,21 @@ const CalendarScreen = ({ navigation }) => {
         formatRiskAssessmentSchedules();
     }, [riskAssessmentScheduleList]);
 
+    function handleAgendaItemPress(event) {
+        console.log(event);
+        navigation.navigate(
+            navigationRoutes.SMARISKASSESSMENTSCHEDULEEDITORSCREEN,
+            {
+                riskAssessmentScheduleId: event.id,
+            }
+        );
+    }
+
     const renderItem = (item) => {
         return (
-            <TouchableOpacity style={styles.agendaItemContainer}>
+            <TouchableOpacity
+                style={styles.agendaItemContainer}
+                onPress={() => handleAgendaItemPress(item)}>
                 <Card>
                     <Card.Content>
                         <View style={styles.agendaItemContentContainer}>

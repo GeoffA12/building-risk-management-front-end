@@ -503,8 +503,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         );
     }
 
-    console.log(riskAssessmentSchedules);
-
     function validateBuildingRiskAssessmentPlayground() {
         let isValid = false;
         if (buildingRiskAssessmentPlayground) {
