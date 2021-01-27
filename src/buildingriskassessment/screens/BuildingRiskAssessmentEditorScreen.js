@@ -31,7 +31,6 @@ import {
     DISABLED_BUTTON,
 } from '../../common/styles/Colors';
 import { navigationRoutes } from '../../config/NavConfig';
-import { DatePickerAndroid } from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
@@ -591,6 +590,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             return transformedRiskAssessmentSchedules.map((schedule, index) => {
                 return (
                     <RiskAssessmentSchedule
+                        key={schedule.id}
                         schedule={schedule}
                         index={index}
                         cancelPress={handleRiskAssessmentScheduleCancelPress}

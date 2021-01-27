@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-import { riskImpactEnum } from '../config/RiskImpactEnum';
-import { riskCategoryEnum } from '../config/RiskCategoryEnum';
+import { riskImpactEnum } from '../../riskassessmentcalendar/config/RiskImpactEnum';
+import { riskCategoryEnum } from '../../riskassessmentcalendar/config/RiskCategoryEnum';
 
 export const useHazard = () => {
     const [hazardModel, setHazardModel] = useState({

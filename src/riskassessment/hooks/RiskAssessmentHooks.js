@@ -14,8 +14,6 @@ export const useRiskAssessment = () => {
         publisherId: '',
         title: '',
         taskDescription: '',
-        hazards: [],
-        screeners: [],
         riskAssessmentScheduleIds: [],
     });
 
@@ -90,8 +88,7 @@ export const useRiskAssessment = () => {
                 publisherId: userId,
                 title: playground.title,
                 taskDescription: playground.taskDescription,
-                hazards: playground.hazards,
-                screeners: playground.screeners,
+                riskAssessmentScheduleIds: playground.riskAssessmentScheduleIds,
             };
         } else {
             uri = 'createRiskAssessment';
@@ -99,8 +96,6 @@ export const useRiskAssessment = () => {
                 publisherId: userId,
                 title: playground.title,
                 taskDescription: playground.taskDescription,
-                hazards: playground.hazards,
-                screeners: playground.screeners,
             };
         }
         let riskAssessment;

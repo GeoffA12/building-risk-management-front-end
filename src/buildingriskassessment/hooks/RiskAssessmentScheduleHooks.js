@@ -23,6 +23,8 @@ export const useRiskAssessmentSchedule = () => {
         riskLevel: riskLevelEnum.EMPTY.urlValue,
         siteMaintenanceAssociateIds: [],
         workOrder: 0,
+        hazards: [],
+        screeners: [],
         buildingRiskAssessmentId: '',
         riskAssessmentId: '',
     });
@@ -45,12 +47,13 @@ export const useRiskAssessmentSchedule = () => {
                 {
                     title: riskAssessmentScheduleInput.title,
                     publisherId: userId,
-                    status: riskAssessmentScheduleInput.status,
                     dueDate: riskAssessmentScheduleInput.dueDate,
                     riskLevel: riskAssessmentScheduleInput.riskLevel,
                     siteMaintenanceAssociateIds:
                         riskAssessmentScheduleInput.siteMaintenanceAssociateIds,
                     workOrder: riskAssessmentScheduleInput.workOrder,
+                    hazards: riskAssessmentScheduleInput.hazards,
+                    screeners: riskAssessmentScheduleInput.screeners,
                     buildingRiskAssessmentId:
                         riskAssessmentScheduleInput.buildingRiskAssessmentId,
                     riskAssessmentId:
@@ -95,12 +98,13 @@ export const useRiskAssessmentSchedule = () => {
                     createRiskAssessmentScheduleInput: {
                         title: riskAssessmentScheduleInput.title,
                         publisherId: userId,
-                        status: riskAssessmentScheduleInput.status,
                         dueDate: riskAssessmentScheduleInput.dueDate,
                         riskLevel: riskAssessmentScheduleInput.riskLevel,
                         siteMaintenanceAssociateIds:
                             riskAssessmentScheduleInput.siteMaintenanceAssociateIds,
                         workOrder: riskAssessmentScheduleInput.workOrder,
+                        hazards: riskAssessmentScheduleInput.hazards,
+                        screeners: riskAssessmentScheduleInput.screeners,
                         buildingRiskAssessmentId:
                             riskAssessmentScheduleInput.buildingRiskAssessmentId,
                         riskAssessmentId:
