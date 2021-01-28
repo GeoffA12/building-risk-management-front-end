@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash.isequal';
 import Icon from 'react-native-ionicons';
 import AuthContext from '../../auth/contexts/AuthContext';
 import ScreenerResponse from '../components/ScreenerResponse';
@@ -14,13 +15,19 @@ import HazardPreview from '../components/HazardPreview';
 import Loading from '../../common/components/Loading';
 import Error from '../../common/components/Error';
 import EntityStatus from '../../common/components/EntityStatus';
-import { useRiskAssessment } from '../../riskassessment/hooks/RiskAssessmentHooks';
 import { useRiskAssessmentSchedule } from '../../buildingriskassessment/hooks/RiskAssessmentScheduleHooks';
 import { useAPI } from '../../common/hooks/API';
-import { DARK_BLUE, LIGHT_GRAY } from '../../common/styles/Colors';
+import {
+    DARK_BLUE,
+    LIGHT_GRAY,
+    DISABLED_BUTTON,
+} from '../../common/styles/Colors';
 import { riskLevelEnum } from '../../buildingriskassessment/config/RiskLevelEnum';
 import { statusEnum } from '../../buildingriskassessment/config/StatusEnum';
+import { useRiskAssessmentScheduleValidation } from '../utils/Validation';
+import { entityTrailUtils } from '../../utils/EntityTrail';
 import EnhancedPicker from '../../common/components/EnhancedPicker';
+import { navigationRoutes } from '../../config/NavConfig';
 
 const styles = StyleSheet.create({
     container: {
@@ -70,6 +77,16 @@ const styles = StyleSheet.create({
         width: '28%',
         borderRadius: 10,
     },
+    disabledIconButton: {
+        flexDirection: 'row',
+        backgroundColor: `${DISABLED_BUTTON}`,
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        marginHorizontal: 10,
+        marginVertical: 8,
+        width: '28%',
+        borderRadius: 10,
+    },
     iconButtonStyle: {
         color: `${LIGHT_GRAY}`,
         padding: 4,
@@ -103,6 +120,7 @@ const styles = StyleSheet.create({
         padding: 6,
         marginHorizontal: 10,
         textDecorationLine: 'underline',
+        textAlign: 'center',
     },
     pickerRowContainer: {
         width: '60%',
@@ -119,13 +137,6 @@ const styles = StyleSheet.create({
 
 const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     const { user } = useContext(AuthContext);
-    const {
-        riskAssessmentModel,
-        setRiskAssessmentModel,
-        riskAssessmentPlayground,
-        setRiskAssessmentPlayground,
-        getRiskAssessment,
-    } = useRiskAssessment();
 
     const {
         riskAssessmentScheduleModel,
@@ -133,30 +144,43 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         riskAssessmentSchedulePlayground,
         setRiskAssessmentSchedulePlayground,
         getRiskAssessmentSchedule,
+        submitRiskAssessmentSchedule,
     } = useRiskAssessmentSchedule();
     const { loading, setLoading, error, setError } = useAPI();
+    const {
+        validateHazards,
+        validateScreeners,
+    } = useRiskAssessmentScheduleValidation();
+    const { getUserLastUpdatedId } = entityTrailUtils();
+    const [isDirty, setIsDirty] = useState(false);
 
     useEffect(() => {
         if (route.params && route.params.riskAssessmentScheduleId) {
             loadRiskAssessmentScheduleId();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [route]);
 
     useEffect(() => {
         setRiskAssessmentSchedulePlayground(
             cloneDeep(riskAssessmentScheduleModel)
         );
-        if (riskAssessmentScheduleModel.riskAssessmentId) {
-            loadRiskAssessment(riskAssessmentScheduleModel.riskAssessmentId);
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [riskAssessmentScheduleModel]);
 
     useEffect(() => {
-        setRiskAssessmentPlayground(cloneDeep(riskAssessmentModel));
+        if (
+            isEqual(
+                riskAssessmentSchedulePlayground,
+                riskAssessmentScheduleModel
+            )
+        ) {
+            setIsDirty(false);
+        } else {
+            setIsDirty(true);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [riskAssessmentModel]);
+    }, [riskAssessmentSchedulePlayground]);
 
     async function loadRiskAssessmentScheduleId() {
         setLoading(true);
@@ -169,20 +193,6 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             setError(riskAssessmentScheduleResponse.error.message);
         } else {
             setRiskAssessmentScheduleModel(riskAssessmentScheduleResponse.data);
-        }
-    }
-
-    async function loadRiskAssessment(riskAssessmentId) {
-        setLoading(true);
-        const riskAssessmentResponse = await getRiskAssessment(
-            riskAssessmentId
-        );
-        setLoading(false);
-        if (!riskAssessmentResponse.data) {
-            console.error(riskAssessmentResponse.error);
-            setError(riskAssessmentResponse.error.message);
-        } else {
-            setRiskAssessmentModel(riskAssessmentResponse.data);
         }
     }
 
@@ -210,7 +220,7 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     }
 
     function handleHazardOnSavePress(hazardPlayground, hazardIndex) {
-        setRiskAssessmentPlayground((prevPlayground) => {
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
             let updatedPlayground = { ...prevPlayground };
             let updatedHazards = [...updatedPlayground.hazards];
             updatedHazards[hazardIndex] = hazardPlayground;
@@ -220,7 +230,7 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     }
 
     function handleHazardCheckPress(hazardIndex) {
-        setRiskAssessmentPlayground((prevPlayground) => {
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
             let updatedPlayground = { ...prevPlayground };
             let hazardToUpdate = updatedPlayground.hazards[hazardIndex];
             let updatedFulfillValue =
@@ -237,19 +247,38 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                 riskImpact: updatedHazards[hazardIndex].riskImpact,
             };
             updatedPlayground.hazards = updatedHazards;
-            console.log(updatedPlayground);
             return updatedPlayground;
         });
     }
 
-    function handleSaveRiskAssessmentSchedulePress() {
-        console.log('Risk assessment schedule saved!');
+    console.log(riskAssessmentSchedulePlayground);
+
+    async function handleSaveRiskAssessmentSchedulePress() {
+        setLoading(true);
+        const riskAssessmentScheduleResponse = await submitRiskAssessmentSchedule(
+            riskAssessmentSchedulePlayground,
+            user.id
+        );
+        setLoading(false);
+        if (!riskAssessmentScheduleResponse.data) {
+            console.error(riskAssessmentScheduleResponse.error);
+            setError(riskAssessmentScheduleResponse.error.message);
+        } else {
+            navigation.navigate(
+                navigationRoutes.SMARISKASSESSMENTSCHEDULEEDITORSCREEN,
+                {
+                    riskAssessmentScheduleId:
+                        riskAssessmentScheduleResponse.data.id,
+                }
+            );
+        }
     }
 
     function handleScreenerResponseChange(index, apiValue) {
-        let existingScreener = riskAssessmentPlayground.screeners[index];
+        let existingScreener =
+            riskAssessmentSchedulePlayground.screeners[index];
         if (existingScreener.response !== apiValue) {
-            setRiskAssessmentPlayground((prevPlayground) => {
+            setRiskAssessmentSchedulePlayground((prevPlayground) => {
                 let updatedPlayground = { ...prevPlayground };
                 let updatedScreeners = [...updatedPlayground.screeners];
                 updatedScreeners[index] = {
@@ -262,6 +291,15 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         }
     }
 
+    function validateRiskAssessmentScheduleSubmissionInput() {
+        return (
+            riskAssessmentSchedulePlayground.riskLevel !==
+                riskLevelEnum.EMPTY.urlValue &&
+            validateScreeners(riskAssessmentSchedulePlayground.screeners) &&
+            validateHazards(riskAssessmentSchedulePlayground.hazards)
+        );
+    }
+
     return (
         <ScrollView style={styles.container}>
             <Error errorMessage={error} />
@@ -270,9 +308,9 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                     {riskAssessmentSchedulePlayground.publisherId ? (
                         <EntityStatus
                             entityName={'Risk assessment schedule'}
-                            publisherId={
-                                riskAssessmentSchedulePlayground.publisherId
-                            }
+                            publisherId={getUserLastUpdatedId(
+                                riskAssessmentSchedulePlayground
+                            )}
                             updatedAt={
                                 riskAssessmentSchedulePlayground.updatedAt
                             }
@@ -283,8 +321,17 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             <View style={styles.sectionContainer}>
                 <View style={styles.row}>
                     <TouchableOpacity
-                        style={styles.iconButton}
-                        onPress={handleSaveRiskAssessmentSchedulePress}>
+                        style={
+                            isDirty &&
+                            validateRiskAssessmentScheduleSubmissionInput()
+                                ? styles.iconButton
+                                : styles.disabledIconButton
+                        }
+                        onPress={handleSaveRiskAssessmentSchedulePress}
+                        disabled={
+                            !isDirty ||
+                            !validateRiskAssessmentScheduleSubmissionInput()
+                        }>
                         <Text style={styles.iconText}>Save</Text>
                         <Icon
                             name={'save'}
@@ -326,10 +373,12 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                 </View>
             </View>
             <View style={styles.sectionContainer}>
-                <Text style={styles.underlineStatusText}>Screeners:</Text>
-                {riskAssessmentPlayground.screeners &&
-                riskAssessmentPlayground.screeners.length > 0
-                    ? riskAssessmentPlayground.screeners.map(
+                <Text style={styles.underlineStatusText}>
+                    Screening Questions:
+                </Text>
+                {riskAssessmentSchedulePlayground.screeners &&
+                riskAssessmentSchedulePlayground.screeners.length > 0
+                    ? riskAssessmentSchedulePlayground.screeners.map(
                           (screener, index) => {
                               return (
                                   <ScreenerResponse
@@ -347,26 +396,29 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             </View>
             <View style={styles.sectionContainer}>
                 <Text style={styles.underlineStatusText}>Hazards:</Text>
-                {riskAssessmentPlayground.hazards &&
-                riskAssessmentPlayground.hazards.length > 0
-                    ? riskAssessmentPlayground.hazards.map((hazard, index) => {
-                          return (
-                              <HazardPreview
-                                  key={index}
-                                  hazard={hazard}
-                                  handleHazardOnSavePress={
-                                      handleHazardOnSavePress
-                                  }
-                                  handleHazardCheckPress={
-                                      handleHazardCheckPress
-                                  }
-                                  hazardIndex={index}
-                              />
-                          );
-                      })
+                {riskAssessmentSchedulePlayground.hazards &&
+                riskAssessmentSchedulePlayground.hazards.length > 0
+                    ? riskAssessmentSchedulePlayground.hazards.map(
+                          (hazard, index) => {
+                              return (
+                                  <HazardPreview
+                                      key={index}
+                                      hazard={hazard}
+                                      handleHazardOnSavePress={
+                                          handleHazardOnSavePress
+                                      }
+                                      handleHazardCheckPress={
+                                          handleHazardCheckPress
+                                      }
+                                      hazardIndex={index}
+                                  />
+                              );
+                          }
+                      )
                     : null}
             </View>
             <View style={styles.sectionContainer}>
+                <Text style={styles.underlineStatusText}>Risk Level:</Text>
                 <View style={styles.row}>
                     <View style={styles.pickerRowContainer}>
                         <EnhancedPicker

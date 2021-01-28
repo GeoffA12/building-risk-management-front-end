@@ -198,6 +198,28 @@ export const useRiskAssessmentSchedule = () => {
         return attachmentResponseObject;
     }
 
+    async function submitRiskAssessmentSchedule(playground, userId) {
+        let riskAssessmentSchedule;
+        let riskAssessmentScheduleResponse = { ...responseObject };
+        try {
+            riskAssessmentSchedule = await loadData(
+                `${BASE_URL}/submitRiskAssessmentSchedule`,
+                'POST',
+                {
+                    id: playground.id,
+                    publisherId: userId,
+                    screeners: playground.screeners,
+                    hazards: playground.hazards,
+                    riskLevel: playground.riskLevel,
+                }
+            );
+            riskAssessmentScheduleResponse.data = riskAssessmentSchedule;
+        } catch (e) {
+            riskAssessmentScheduleResponse.error = e;
+        }
+        return riskAssessmentScheduleResponse;
+    }
+
     return {
         riskAssessmentScheduleModel,
         setRiskAssessmentScheduleModel,
@@ -210,5 +232,6 @@ export const useRiskAssessmentSchedule = () => {
         getRiskAssessmentSchedulesByBuildingRiskAssessmentId,
         getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding,
         attachBuildingRiskAssessmentIdToRiskAssessmentSchedules,
+        submitRiskAssessmentSchedule,
     };
 };
