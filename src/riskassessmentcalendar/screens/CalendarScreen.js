@@ -1,11 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Agenda } from 'react-native-calendars';
-import { Card } from 'react-native-paper';
+import { Avatar, Card } from 'react-native-paper';
 import AuthContext from '../../auth/contexts/AuthContext';
 import { useHeader } from '../hooks/CalendarHeader';
 import { BASE_URL } from '../../config/APIConfig';
 import { navigationRoutes } from '../../config/NavConfig';
+import { convertUTCDateToLocalDate } from '../../utils/Time.js';
+import { useCalendarHooks } from '../hooks/CalendarHooks.js';
 
 const styles = StyleSheet.create({
     container: {
@@ -28,21 +30,18 @@ const CalendarScreen = ({ navigation }) => {
         user,
     } = useContext(AuthContext);
     const { setCalendarHeader } = useHeader();
+    const { getRiskAssessmentSchedules, riskAssessmentScheduleList, setRiskAssessmentScheduleList } = useCalendarHooks();
     const [
         riskAssessmentScheduleIdsList,
         setRiskAssessmentScheduleIdsList,
-    ] = useState([]);
-    const [
-        riskAssessmentScheduleList,
-        setRiskAssessmentScheduleList,
     ] = useState([]);
     const [itemsList, setItemsListForAgenda] = useState({});
     const today = new Date().toISOString().slice(0, 10);
 
     useEffect(() => {
-        setCalendarHeader(navigation, logout);
+        setCalendarHeader(navigation, logout, riskAssessmentScheduleIdsList);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [navigation, logout]);
+    }, [navigation, logout, riskAssessmentScheduleIdsList]);
 
     useEffect(() => {
         async function getAssignedRiskAssessmentScheduleIds() {
@@ -58,51 +57,51 @@ const CalendarScreen = ({ navigation }) => {
     }, []);
 
     useEffect(() => {
-        async function getRiskAssessmentSchedules() {
-            if (riskAssessmentScheduleIdsList.length > 0) {
-                const rawData = JSON.stringify({
-                    riskAssessmentScheduleIds: riskAssessmentScheduleIdsList,
-                });
-                const riskAssessmentSchedules = await fetch(
-                    `${BASE_URL}/getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                        },
-                        body: rawData,
-                    }
-                );
-                const data = await riskAssessmentSchedules.json();
-                setRiskAssessmentScheduleList(data);
-            }
-        }
-        getRiskAssessmentSchedules();
+        loadRiskAssessmentSchedules();
     }, [riskAssessmentScheduleIdsList]);
+
+    async function loadRiskAssessmentSchedules() {
+        await getRiskAssessmentSchedules(riskAssessmentScheduleIdsList);
+    }
 
     useEffect(() => {
         async function formatRiskAssessmentSchedules() {
-            const items = {};
-            for (let x = 0; x < riskAssessmentScheduleList.length; ++x) {
-                const schedule = riskAssessmentScheduleList[x];
-                items[schedule.dueDate.slice(0, 10)] = [
-                    { name: schedule.title, id: schedule.id },
-                ];
+            if (riskAssessmentScheduleList) {
+                const items = {};
+                for (let x = 0; x < riskAssessmentScheduleList.length; ++x) {
+                    const schedule = riskAssessmentScheduleList[x];
+                    items[schedule.dueDate.slice(0, 10)] = [
+                        {
+                            name: schedule.title + "\n\n" +
+                                convertUTCDateToLocalDate(schedule.dueDate) + "\n" +
+                                formatStatus(schedule.status), id: schedule.id
+                        },
+                    ];
+                }
+                setItemsListForAgenda(items);
             }
-            setItemsListForAgenda(items);
         }
         formatRiskAssessmentSchedules();
     }, [riskAssessmentScheduleList]);
 
     function handleAgendaItemPress(event) {
-        console.log(event);
         navigation.navigate(
             navigationRoutes.SMARISKASSESSMENTSCHEDULEEDITORSCREEN,
             {
                 riskAssessmentScheduleId: event.id,
             }
         );
+    }
+
+    function formatStatus(status) {
+        const splitStatus = status.split("_");
+        var formattedStatus = "";
+        for (const word in splitStatus) {
+            var lower = splitStatus[word].toLowerCase();
+            var capital = lower[0].toUpperCase() + lower.slice(1);
+            formattedStatus += capital + " ";
+        }
+        return formattedStatus;
     }
 
     const renderItem = (item) => {
