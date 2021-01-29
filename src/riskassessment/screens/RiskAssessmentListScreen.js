@@ -188,7 +188,6 @@ const RiskAssessmentListScreen = ({ navigation }) => {
                 placeholder={'Title..'}
                 handleFilterChange={handleFilterChange}
                 selectedFilterValue={selectedFilterValue}
-                // associatedSiteIds={user.associatedSiteIds}
                 setPickerCallback={getPickers}
             />
 

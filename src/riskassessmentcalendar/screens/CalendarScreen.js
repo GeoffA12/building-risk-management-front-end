@@ -6,7 +6,6 @@ import AuthContext from '../../auth/contexts/AuthContext';
 import { useHeader } from '../hooks/CalendarHeader';
 import { BASE_URL } from '../../config/APIConfig';
 import { navigationRoutes } from '../../config/NavConfig';
-import { convertUTCDateToLocalDate } from '../../utils/Time.js';
 import { useCalendarHooks } from '../hooks/CalendarHooks.js';
 
 const styles = StyleSheet.create({
@@ -29,60 +28,70 @@ const CalendarScreen = ({ navigation }) => {
         auth: { logout },
         user,
     } = useContext(AuthContext);
-    const { setCalendarHeader } = useHeader();
-    const { getRiskAssessmentSchedules, riskAssessmentScheduleList, setRiskAssessmentScheduleList } = useCalendarHooks();
-    const [
-        riskAssessmentScheduleIdsList,
-        setRiskAssessmentScheduleIdsList,
-    ] = useState([]);
-    const [itemsList, setItemsListForAgenda] = useState({});
+    const { setCalendarHeader } = useHeader({ user });
+    const {
+        riskAssessmentScheduleList,
+        setRiskAssessmentScheduleList,
+        assignedRiskAssessmentScheduleIds,
+        setAssignedRiskAssessmentScheduleIds,
+        getAssignedRiskAssessmentSchedules,
+        getSiteMaintenanceAssociateById,
+        agendaItems,
+        setAgendaItems,
+        formatRiskAssessmentSchedules,
+    } = useCalendarHooks();
+
     const today = new Date().toISOString().slice(0, 10);
 
     useEffect(() => {
-        setCalendarHeader(navigation, logout, riskAssessmentScheduleIdsList);
+        setCalendarHeader(navigation, logout, loadSiteMaintenanceAssociate);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [navigation, logout, riskAssessmentScheduleIdsList]);
+    }, [navigation, logout, assignedRiskAssessmentScheduleIds]);
 
     useEffect(() => {
-        async function getAssignedRiskAssessmentScheduleIds() {
-            const siteMaintenanceAssociate = await fetch(
-                `${BASE_URL}/getSiteMaintenanceAssociateById?id=${user.id}`
-            );
-            const data = await siteMaintenanceAssociate.json();
-            const idsList = data.assignedRiskAssessmentScheduleIds;
-            setRiskAssessmentScheduleIdsList(idsList);
-        }
-        getAssignedRiskAssessmentScheduleIds();
+        loadSiteMaintenanceAssociate();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        loadRiskAssessmentSchedules();
-    }, [riskAssessmentScheduleIdsList]);
-
-    async function loadRiskAssessmentSchedules() {
-        await getRiskAssessmentSchedules(riskAssessmentScheduleIdsList);
-    }
+        if (
+            assignedRiskAssessmentScheduleIds &&
+            assignedRiskAssessmentScheduleIds.length > 0
+        ) {
+            loadAssignedRiskAssessmentSchedules(
+                assignedRiskAssessmentScheduleIds
+            );
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [assignedRiskAssessmentScheduleIds]);
 
     useEffect(() => {
-        async function formatRiskAssessmentSchedules() {
-            if (riskAssessmentScheduleList) {
-                const items = {};
-                for (let x = 0; x < riskAssessmentScheduleList.length; ++x) {
-                    const schedule = riskAssessmentScheduleList[x];
-                    items[schedule.dueDate.slice(0, 10)] = [
-                        {
-                            name: schedule.title + "\n\n" +
-                                convertUTCDateToLocalDate(schedule.dueDate) + "\n" +
-                                formatStatus(schedule.status), id: schedule.id
-                        },
-                    ];
-                }
-                setItemsListForAgenda(items);
-            }
+        if (
+            riskAssessmentScheduleList &&
+            riskAssessmentScheduleList.length > 0
+        ) {
+            const formattedSchedules = formatRiskAssessmentSchedules(
+                riskAssessmentScheduleList
+            );
+            setAgendaItems(formattedSchedules);
         }
-        formatRiskAssessmentSchedules();
     }, [riskAssessmentScheduleList]);
+
+    async function loadSiteMaintenanceAssociate() {
+        const siteMaintenanceAssociate = await getSiteMaintenanceAssociateById(
+            user.id
+        );
+        setAssignedRiskAssessmentScheduleIds(
+            siteMaintenanceAssociate.assignedRiskAssessmentScheduleIds
+        );
+    }
+
+    async function loadAssignedRiskAssessmentSchedules(ids) {
+        const assignedRiskAssessmentScheduleData = await getAssignedRiskAssessmentSchedules(
+            ids
+        );
+        setRiskAssessmentScheduleList(assignedRiskAssessmentScheduleData);
+    }
 
     function handleAgendaItemPress(event) {
         navigation.navigate(
@@ -91,17 +100,6 @@ const CalendarScreen = ({ navigation }) => {
                 riskAssessmentScheduleId: event.id,
             }
         );
-    }
-
-    function formatStatus(status) {
-        const splitStatus = status.split("_");
-        var formattedStatus = "";
-        for (const word in splitStatus) {
-            var lower = splitStatus[word].toLowerCase();
-            var capital = lower[0].toUpperCase() + lower.slice(1);
-            formattedStatus += capital + " ";
-        }
-        return formattedStatus;
     }
 
     const renderItem = (item) => {
@@ -123,7 +121,7 @@ const CalendarScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Agenda
-                items={itemsList}
+                items={agendaItems}
                 selected={today}
                 renderItem={renderItem}
             />

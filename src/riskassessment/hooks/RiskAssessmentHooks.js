@@ -29,7 +29,7 @@ export const useRiskAssessment = () => {
             },
             {
                 label: riskAssessmentPickerOptions.MY_ASSESSMENTS.label,
-                value: riskAssessmentPickerOptions.ALL_ASSESSMENTS.value,
+                value: riskAssessmentPickerOptions.MY_ASSESSMENTS.value,
             },
         ];
     }

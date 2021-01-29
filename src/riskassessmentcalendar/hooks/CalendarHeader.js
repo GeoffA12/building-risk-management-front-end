@@ -10,19 +10,33 @@ const styles = StyleSheet.create({
     },
 });
 
-export const useHeader = () => {
-    const { getRiskAssessmentSchedules } = useCalendarHooks();
+export const useHeader = ({ user }) => {
+    const {
+        getSiteMaintenanceAssociateById,
+        setAssignedRiskAssessmentScheduleIds,
+    } = useCalendarHooks();
 
-    async function loadRiskAssessmentSchedules(riskAssessmentScheduleIdsList) {
-        console.log("Load Schedule");
-        await getRiskAssessmentSchedules(riskAssessmentScheduleIdsList);
+    async function loadRiskAssessmentSchedules() {
+        const siteMaintenanceAssociate = await getSiteMaintenanceAssociateById(
+            user.id
+        );
+        setAssignedRiskAssessmentScheduleIds(
+            siteMaintenanceAssociate.assignedRiskAssessmentScheduleIds
+        );
     }
 
-    function setCalendarHeader(navigation, logout, riskAssessmentScheduleIdsList) {
+    function setCalendarHeader(
+        navigation,
+        logout,
+        getSiteMaintenanceAssociate
+    ) {
         navigation.setOptions({
             headerRight: () => (
                 <View style={styles.headerContainer}>
-                    <HeaderButton name={'refresh'} onPress={async () => loadRiskAssessmentSchedules(riskAssessmentScheduleIdsList)} />
+                    <HeaderButton
+                        name={'refresh'}
+                        onPress={() => getSiteMaintenanceAssociate()}
+                    />
                 </View>
             ),
             headerLeft: () => (

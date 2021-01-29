@@ -1,27 +1,84 @@
 import { useState } from 'react';
 import { BASE_URL } from '../../config/APIConfig';
 import { useAPI } from '../../common/hooks/API';
+import { convertUTCDateToLocalDate } from '../../utils/Time.js';
 
 export const useCalendarHooks = () => {
     const { loadData } = useAPI();
-    const [riskAssessmentScheduleList, setRiskAssessmentScheduleList] = useState([]);
-    async function getRiskAssessmentSchedules(riskAssessmentScheduleIdsList) {
-        console.log(riskAssessmentScheduleIdsList);
-        if (riskAssessmentScheduleIdsList.length > 0) {
-            //const rawData = JSON.stringify({
-            //    riskAssessmentScheduleIds: riskAssessmentScheduleIdsList,
-            //});
-            const riskAssessmentSchedules = await loadData(`${BASE_URL}/getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList`, 'POST', {
-                riskAssessmentScheduleIds: riskAssessmentScheduleIdsList
-            });
+    const [
+        riskAssessmentScheduleList,
+        setRiskAssessmentScheduleList,
+    ] = useState([]);
 
-            setRiskAssessmentScheduleList(riskAssessmentSchedules);
-            console.log(riskAssessmentSchedules);
+    const [
+        assignedRiskAssessmentScheduleIds,
+        setAssignedRiskAssessmentScheduleIds,
+    ] = useState([]);
+
+    const [agendaItems, setAgendaItems] = useState([]);
+
+    async function getSiteMaintenanceAssociateById(userId) {
+        const siteMaintenanceAssociate = await loadData(
+            `${BASE_URL}/getSiteMaintenanceAssociateById?id=${userId}`,
+            'GET'
+        );
+        return siteMaintenanceAssociate;
+    }
+
+    async function getAssignedRiskAssessmentSchedules(
+        riskAssessmentScheduleIdsList
+    ) {
+        if (riskAssessmentScheduleIdsList.length > 0) {
+            const riskAssessmentSchedules = await loadData(
+                `${BASE_URL}/getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList`,
+                'POST',
+                {
+                    riskAssessmentScheduleIds: riskAssessmentScheduleIdsList,
+                }
+            );
+            return riskAssessmentSchedules;
         }
     }
-    return {
-        getRiskAssessmentSchedules,
-        riskAssessmentScheduleList,
-        setRiskAssessmentScheduleList
+
+    function formatRiskAssessmentSchedules(riskAssessmentSchedules) {
+        const items = {};
+        for (let x = 0; x < riskAssessmentSchedules.length; ++x) {
+            const schedule = riskAssessmentSchedules[x];
+            items[schedule.dueDate.slice(0, 10)] = [
+                {
+                    name:
+                        schedule.title +
+                        '\n\n' +
+                        convertUTCDateToLocalDate(schedule.dueDate) +
+                        '\n' +
+                        formatStatus(schedule.status),
+                    id: schedule.id,
+                },
+            ];
+        }
+        return items;
     }
-}
+
+    function formatStatus(status) {
+        const splitStatus = status.split('_');
+        var formattedStatus = '';
+        for (const word in splitStatus) {
+            var lower = splitStatus[word].toLowerCase();
+            var capital = lower[0].toUpperCase() + lower.slice(1);
+            formattedStatus += capital + ' ';
+        }
+        return formattedStatus;
+    }
+
+    return {
+        assignedRiskAssessmentScheduleIds,
+        setAssignedRiskAssessmentScheduleIds,
+        getAssignedRiskAssessmentSchedules,
+        getSiteMaintenanceAssociateById,
+        riskAssessmentScheduleList,
+        setRiskAssessmentScheduleList,
+        formatRiskAssessmentSchedules,
+        agendaItems,
+        setAgendaItems,
+    };
+};

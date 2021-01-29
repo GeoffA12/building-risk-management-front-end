@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useRiskAssessment } from '../../riskassessment/hooks/RiskAssessmentHooks';
 import { useAPI } from '../../common/hooks/API';
-import { riskLevelEnum } from '../config/RiskLevelEnum';
-import { statusEnum } from '../config/StatusEnum';
+import { filterOptions } from '../config/FilterOptions';
 import { BASE_URL } from '../../config/APIConfig';
 
 export const useBuildingRiskAssessment = () => {
@@ -24,6 +23,23 @@ export const useBuildingRiskAssessment = () => {
     });
 
     const { riskAssessmentModel, setRiskAssessmentModel } = useRiskAssessment();
+
+    function getInitialPickerState() {
+        return [
+            {
+                label: filterOptions.INITIAL_VALUE.label,
+                value: filterOptions.INITIAL_VALUE.value,
+            },
+            {
+                label: filterOptions.ALL_BUILDING_ASSESSMENTS.label,
+                value: filterOptions.ALL_BUILDING_ASSESSMENTS.value,
+            },
+            {
+                label: filterOptions.MY_BUILDING_ASSESSMENTS.label,
+                value: filterOptions.MY_BUILDING_ASSESSMENTS.value,
+            },
+        ];
+    }
 
     async function getBuildingRiskAssessments(associatedSiteIds) {
         let buildingRiskAssessments;
@@ -127,5 +143,6 @@ export const useBuildingRiskAssessment = () => {
         getSiteMaintenanceAssociates,
         saveBuildingRiskAssessment,
         getBuildingRiskAssessment,
+        getInitialPickerState,
     };
 };
