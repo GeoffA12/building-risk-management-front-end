@@ -33,10 +33,17 @@ export const useBuildingRiskAssessment = () => {
                 `${BASE_URL}/getBuildingRiskAssessmentsBySite`,
                 'POST',
                 {
-                    associatedSiteIds: associatedSiteIds,
+                    pageInput: {
+                        sortBy: 'updatedAt',
+                        sortDirection: 'DESC',
+                    },
+                    getEntityBySiteInput: {
+                        associatedSiteIds: associatedSiteIds,
+                    },
                 }
             );
-            bulidingRiskAssessmentResponse.data = buildingRiskAssessments;
+            bulidingRiskAssessmentResponse.data =
+                buildingRiskAssessments.buildingriskassessments;
         } catch (e) {
             bulidingRiskAssessmentResponse.error = e;
         }
