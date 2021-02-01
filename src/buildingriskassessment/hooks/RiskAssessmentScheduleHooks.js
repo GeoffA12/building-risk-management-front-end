@@ -23,6 +23,8 @@ export const useRiskAssessmentSchedule = () => {
         riskLevel: riskLevelEnum.EMPTY.urlValue,
         siteMaintenanceAssociateIds: [],
         workOrder: 0,
+        hazards: [],
+        screeners: [],
         buildingRiskAssessmentId: '',
         riskAssessmentId: '',
     });
@@ -45,12 +47,13 @@ export const useRiskAssessmentSchedule = () => {
                 {
                     title: riskAssessmentScheduleInput.title,
                     publisherId: userId,
-                    status: riskAssessmentScheduleInput.status,
                     dueDate: riskAssessmentScheduleInput.dueDate,
                     riskLevel: riskAssessmentScheduleInput.riskLevel,
                     siteMaintenanceAssociateIds:
                         riskAssessmentScheduleInput.siteMaintenanceAssociateIds,
                     workOrder: riskAssessmentScheduleInput.workOrder,
+                    hazards: riskAssessmentScheduleInput.hazards,
+                    screeners: riskAssessmentScheduleInput.screeners,
                     buildingRiskAssessmentId:
                         riskAssessmentScheduleInput.buildingRiskAssessmentId,
                     riskAssessmentId:
@@ -95,12 +98,13 @@ export const useRiskAssessmentSchedule = () => {
                     createRiskAssessmentScheduleInput: {
                         title: riskAssessmentScheduleInput.title,
                         publisherId: userId,
-                        status: riskAssessmentScheduleInput.status,
                         dueDate: riskAssessmentScheduleInput.dueDate,
                         riskLevel: riskAssessmentScheduleInput.riskLevel,
                         siteMaintenanceAssociateIds:
                             riskAssessmentScheduleInput.siteMaintenanceAssociateIds,
                         workOrder: riskAssessmentScheduleInput.workOrder,
+                        hazards: riskAssessmentScheduleInput.hazards,
+                        screeners: riskAssessmentScheduleInput.screeners,
                         buildingRiskAssessmentId:
                             riskAssessmentScheduleInput.buildingRiskAssessmentId,
                         riskAssessmentId:
@@ -194,6 +198,28 @@ export const useRiskAssessmentSchedule = () => {
         return attachmentResponseObject;
     }
 
+    async function submitRiskAssessmentSchedule(playground, userId) {
+        let riskAssessmentSchedule;
+        let riskAssessmentScheduleResponse = { ...responseObject };
+        try {
+            riskAssessmentSchedule = await loadData(
+                `${BASE_URL}/submitRiskAssessmentSchedule`,
+                'POST',
+                {
+                    id: playground.id,
+                    publisherId: userId,
+                    screeners: playground.screeners,
+                    hazards: playground.hazards,
+                    riskLevel: playground.riskLevel,
+                }
+            );
+            riskAssessmentScheduleResponse.data = riskAssessmentSchedule;
+        } catch (e) {
+            riskAssessmentScheduleResponse.error = e;
+        }
+        return riskAssessmentScheduleResponse;
+    }
+
     return {
         riskAssessmentScheduleModel,
         setRiskAssessmentScheduleModel,
@@ -206,5 +232,6 @@ export const useRiskAssessmentSchedule = () => {
         getRiskAssessmentSchedulesByBuildingRiskAssessmentId,
         getRiskAssessmentSchedulesByRiskAssessmentIdListOfBuilding,
         attachBuildingRiskAssessmentIdToRiskAssessmentSchedules,
+        submitRiskAssessmentSchedule,
     };
 };

@@ -14,8 +14,6 @@ export const useRiskAssessment = () => {
         publisherId: '',
         title: '',
         taskDescription: '',
-        hazards: [],
-        screeners: [],
         riskAssessmentScheduleIds: [],
     });
 
@@ -31,7 +29,7 @@ export const useRiskAssessment = () => {
             },
             {
                 label: riskAssessmentPickerOptions.MY_ASSESSMENTS.label,
-                value: riskAssessmentPickerOptions.ALL_ASSESSMENTS.value,
+                value: riskAssessmentPickerOptions.MY_ASSESSMENTS.value,
             },
         ];
     }
@@ -90,8 +88,7 @@ export const useRiskAssessment = () => {
                 publisherId: userId,
                 title: playground.title,
                 taskDescription: playground.taskDescription,
-                hazards: playground.hazards,
-                screeners: playground.screeners,
+                riskAssessmentScheduleIds: playground.riskAssessmentScheduleIds,
             };
         } else {
             uri = 'createRiskAssessment';
@@ -99,8 +96,6 @@ export const useRiskAssessment = () => {
                 publisherId: userId,
                 title: playground.title,
                 taskDescription: playground.taskDescription,
-                hazards: playground.hazards,
-                screeners: playground.screeners,
             };
         }
         let riskAssessment;

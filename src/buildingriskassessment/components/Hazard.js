@@ -4,7 +4,7 @@ import Icon from 'react-native-ionicons';
 import {
     riskImpactPickerOptions,
     riskCategoryPickerOptions,
-} from '../config/PickerOptions';
+} from '../../riskassessment/config/PickerOptions';
 import { DARK_BLUE } from '../../common/styles/Colors';
 
 const styles = StyleSheet.create({

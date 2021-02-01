@@ -118,7 +118,6 @@ const SearchFilters = ({
                         inputContainerStyle={styles.inputContainerStyle}
                         inputStyle={styles.inputStyle}
                         onChangeText={(text) => handleSearchTextChange(text)}
-                        // onCancel={handleCancelPress}
                         value={searchText}
                     />
 

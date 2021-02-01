@@ -5,21 +5,16 @@ import {
     StyleSheet,
     View,
     TouchableOpacity,
-    Modal,
 } from 'react-native';
 import isEqual from 'lodash.isequal';
 import Icon from 'react-native-ionicons';
 import AuthContext from '../../auth/contexts/AuthContext';
 import FormInput from '../../common/components/FormInput';
-import HazardEditor from '../components/HazardEditor';
 import EntityStatus from '../../common/components/EntityStatus';
 import Loading from '../../common/components/Loading';
 import Error from '../../common/components/Error';
-import Hazard from '../components/Hazard';
-import Screener from '../components/Screener';
 import { navigationRoutes } from '../../config/NavConfig';
 import { useRiskAssessment } from '../hooks/RiskAssessmentHooks';
-import { useHazard } from '../../riskassessmentcalendar/hooks/HazardHooks';
 import { useAPI } from '../../common/hooks/API';
 import {
     LIGHT_TEAL,
@@ -106,7 +101,6 @@ const RiskAssessmentEditorScreen = ({
     riskAssessmentId,
 }) => {
     const { user } = useContext(AuthContext);
-    const [modalOpen, setModalOpen] = useState(false);
     const { error, setError, loading, setLoading } = useAPI();
     const {
         riskAssessmentModel,
@@ -118,11 +112,8 @@ const RiskAssessmentEditorScreen = ({
         setRiskAssessmentPlayground,
     } = useRiskAssessment();
 
-    const [hazardIndex, setHazardIndex] = useState(-1);
     const [isDirty, setIsDirty] = useState(true);
     const [hasDeletePermissions, setHasDeletePermissions] = useState(false);
-    const { hazardModel } = useHazard();
-    const [hazardDetails, setHazardDetails] = useState({ ...hazardModel });
 
     useEffect(() => {
         if (route && route.params && route.params.riskAssessmentId) {
@@ -178,8 +169,8 @@ const RiskAssessmentEditorScreen = ({
             console.error(riskAssessmentResponse.error);
             setError(riskAssessmentResponse.error.message);
         } else {
-            navigation.navigate(navigationRoutes.RISKASSESSMENTEDITOR, {
-                riskAssessmentId: riskAssessmentResponse.data.id,
+            navigation.navigate(navigationRoutes.RISKASSESSMENTLIST, {
+                refresh: true,
             });
         }
     }
@@ -208,149 +199,22 @@ const RiskAssessmentEditorScreen = ({
         });
     }
 
-    function handleAddScreenerPress() {
-        const newScreener = {
-            question: '',
-            response: 'EMPTY',
-        };
-        setRiskAssessmentPlayground((prevPlayground) => {
-            const updatedPlayground = { ...prevPlayground };
-            if (updatedPlayground.screeners) {
-                updatedPlayground.screeners = [
-                    ...updatedPlayground.screeners,
-                    newScreener,
-                ];
-            } else {
-                updatedPlayground.screeners = [newScreener];
-            }
-            return updatedPlayground;
-        });
-    }
-
-    function handleAddHazardPress() {
-        setModalOpen(true);
-    }
-
-    function handleRemoveScreener(index) {
-        setRiskAssessmentPlayground((prevPlayground) => {
-            const updatedPlayground = { ...prevPlayground };
-            updatedPlayground.screeners.splice(index, 1);
-            return updatedPlayground;
-        });
-    }
-
-    function handleOnChangeScreenerText(value, index) {
-        const updatedQuestionText = value;
-        setRiskAssessmentPlayground((prevPlayground) => {
-            const updatedPlayground = { ...prevPlayground };
-            updatedPlayground.screeners[index].question = updatedQuestionText;
-            return updatedPlayground;
-        });
-    }
-
-    function handleLeaveHazardEditorPress() {
-        setModalOpen(false);
-    }
-
-    function handleSaveHazardPress(playground, index) {
-        const newHazard = {
-            description: playground.description,
-            directions: playground.directions,
-            riskCategory: playground.riskCategory,
-            riskImpact: playground.riskImpact,
-        };
-        setRiskAssessmentPlayground((prevPlayground) => {
-            const updatedPlayground = { ...prevPlayground };
-            if (!updatedPlayground.hazards) {
-                updatedPlayground.hazards = [newHazard];
-            } else {
-                if (index === -1) {
-                    updatedPlayground.hazards = [
-                        ...updatedPlayground.hazards,
-                        newHazard,
-                    ];
-                } else {
-                    updatedPlayground.hazards[index] = newHazard;
-                }
-            }
-            return updatedPlayground;
-        });
-        setModalOpen(false);
-    }
-
-    function handleHazardEditPress(index) {
-        setHazardIndex(index);
-        const details = riskAssessmentPlayground.hazards[index];
-        setHazardDetails(details);
-        setModalOpen(true);
-    }
-
-    function handleHazardRemovePress(index) {
-        setRiskAssessmentPlayground((prevPlayground) => {
-            const updatedPlayground = { ...prevPlayground };
-            updatedPlayground.hazards.splice(index, 1);
-            return updatedPlayground;
-        });
-    }
-
     // TODO: Disable the save button if the riskAssessmentPlayground isn't dirty.
     function validateRiskAssessmentPlayground() {
         let isValid = false;
         if (riskAssessmentPlayground) {
             if (
                 riskAssessmentPlayground.title &&
-                riskAssessmentPlayground.taskDescription &&
-                riskAssessmentPlayground.screeners &&
-                riskAssessmentPlayground.hazards
+                riskAssessmentPlayground.taskDescription
             ) {
-                if (
-                    riskAssessmentPlayground.hazards.length >= 1 &&
-                    riskAssessmentPlayground.screeners.length >= 1
-                ) {
-                    isValid = true;
-                }
+                isValid = true;
             }
         }
         return isValid;
     }
 
-    function renderHazards() {
-        return riskAssessmentPlayground.hazards.map((hazard, index) => (
-            <Hazard
-                key={index}
-                hazard={hazard}
-                index={index}
-                isRiskAssessmentView={true}
-                onEditPress={handleHazardEditPress}
-                onRemoveHazard={handleHazardRemovePress}
-            />
-        ));
-    }
-
-    function renderScreeners() {
-        return riskAssessmentPlayground.screeners.map((screener, index) => (
-            <Screener
-                key={index}
-                questionText={screener.question}
-                onChangeText={handleOnChangeScreenerText}
-                onRemoveScreener={handleRemoveScreener}
-                isRiskAssessmentView={false}
-                screenerIndex={index}
-            />
-        ));
-    }
-
     return (
         <ScrollView style={styles.container}>
-            <Modal visible={modalOpen} animationType={'slide'}>
-                <HazardEditor
-                    leaveHazardEditorPress={handleLeaveHazardEditorPress}
-                    isMaintenanceView={false}
-                    handleOnSavePress={handleSaveHazardPress}
-                    hazardDetails={hazardDetails}
-                    index={hazardIndex}
-                />
-            </Modal>
             {riskAssessmentPlayground.entityTrail &&
             riskAssessmentPlayground.entityTrail.length >= 1 ? (
                 <EntityStatus
@@ -391,29 +255,6 @@ const RiskAssessmentEditorScreen = ({
                         multiline={true}
                     />
                 </View>
-            </View>
-            <View style={styles.textInputContainer}>
-                <Text style={styles.headerAlignment}>Assessment Questions</Text>
-                <View style={styles.buttonRow}>
-                    <TouchableOpacity
-                        onPress={handleAddScreenerPress}
-                        style={styles.iconButton}>
-                        <Icon name="add" size={22} style={styles.iconStyle} />
-                        <Text style={styles.iconButtonText}>
-                            Screening question
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={handleAddHazardPress}
-                        style={styles.iconButton}>
-                        <Icon name="add" size={22} style={styles.iconStyle} />
-                        <Text style={styles.iconButtonText}>Hazard</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <View style={styles.textInputContainer}>
-                {riskAssessmentPlayground.screeners ? renderScreeners() : null}
-                {riskAssessmentPlayground.hazards ? renderHazards() : null}
             </View>
             <Error errorMessage={error} />
             <View style={styles.textInputContainer}>

@@ -8,7 +8,7 @@ export const convertUTCDateToLocalDate = (dateString) => {
     let militaryHours = date.getHours();
     let localHours = militaryHours;
     let isAM = true;
-    if (militaryHours > 12) {
+    if (militaryHours >= 12) {
         localHours = militaryHours % 12;
         isAM = false;
     }

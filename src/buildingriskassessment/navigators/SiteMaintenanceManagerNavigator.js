@@ -100,7 +100,7 @@ const SiteMaintenanceManagerNavigator = () => {
         return (
             <SiteMaintenanceManagerStack.Navigator mode={'modal'}>
                 <SiteMaintenanceManagerStack.Screen
-                    name="Building Assessment List"
+                    name={navigationRoutes.BUILDINGRISKASSESSMENTLIST}
                     // children={createTopTabs}
                     component={BuildingRiskAssessmentListScreen}
                     // options={({ navigation, route }) => ({
@@ -109,6 +109,7 @@ const SiteMaintenanceManagerNavigator = () => {
                     //     headerRight: () => getHeaderRight(navigation, route),
                     // })}
                     options={{
+                        title: 'Building Assessment List',
                         headerTitleAlign: 'center',
                     }}
                 />

@@ -16,8 +16,8 @@ import FormInput from '../../common/components/FormInput';
 import {
     riskCategoryPickerOptions,
     riskImpactPickerOptions,
-} from '../config/PickerOptions';
-import { useHazard } from '../../riskassessmentcalendar/hooks/HazardHooks';
+} from '../../riskassessment/config/PickerOptions';
+import { useHazard } from '../hooks/HazardHooks';
 import { DARK_BLUE, LIGHT_GRAY } from '../../common/styles/Colors';
 
 const styles = StyleSheet.create({

@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ScrollView, View, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+    ScrollView,
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    Text,
+    Platform,
+    Modal,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import cloneDeep from 'lodash/cloneDeep';
 import Icon from 'react-native-ionicons';
@@ -10,6 +18,10 @@ import StyledButton from '../../common/components/StyledButton';
 import Loading from '../../common/components/Loading';
 import Error from '../../common/components/Error';
 import FormInput from '../../common/components/FormInput';
+import Hazard from '../components/Hazard';
+import Screener from '../components/Screener';
+import HazardEditor from '../components/HazardEditor';
+import { useHazard } from '../hooks/HazardHooks';
 import { useBuildingRiskAssessment } from '../hooks/BuildingRiskAssessmentHooks';
 import { useRiskAssessmentSchedule } from '../hooks/RiskAssessmentScheduleHooks';
 import { stringsEnum } from '../config/StringsEnum';
@@ -22,7 +34,6 @@ import {
     BABY_BLUE,
     DARK_BABY_BLUE,
 } from '../../common/styles/Colors';
-import { Platform } from 'react-native';
 import { navigationRoutes } from '../../config/NavConfig';
 
 const styles = StyleSheet.create({
@@ -61,17 +72,24 @@ const styles = StyleSheet.create({
     },
     iconButton: {
         backgroundColor: `${DARK_BLUE}`,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginHorizontal: 10,
+        marginHorizontal: 8,
         marginVertical: 8,
-        width: '30%',
         borderRadius: 10,
+        flexDirection: 'row',
+        paddingHorizontal: 7,
+        paddingVertical: 5,
     },
-    iconButtonStyle: {
+    iconStyle: {
         color: `${LIGHT_GRAY}`,
-        padding: 4,
-        margin: 1,
+        paddingVertical: 3,
+        paddingHorizontal: 3,
+    },
+    iconButtonText: {
+        color: `${LIGHT_GRAY}`,
+        fontSize: 15,
+        paddingHorizontal: 4,
+        paddingVertical: 3,
+        flexDirection: 'row',
     },
     multiSelectRow: {
         flex: 1,
@@ -95,7 +113,7 @@ const styles = StyleSheet.create({
     workOrderInput: {
         marginHorizontal: 12,
         marginBottom: 4,
-        padding: 2,
+        padding: 4,
         backgroundColor: `${DARK_BLUE}`,
         color: `${LIGHT_GRAY}`,
         width: '45%',
@@ -104,9 +122,16 @@ const styles = StyleSheet.create({
         marginHorizontal: 12,
         marginBottom: 4,
         width: '70%',
-        padding: 1,
+        padding: 4,
         backgroundColor: `${DARK_BLUE}`,
         color: `${LIGHT_GRAY}`,
+    },
+    headerAlignment: {
+        textAlign: 'center',
+        fontSize: 20,
+        fontWeight: '700',
+        padding: 4,
+        color: `${DARK_BLUE}`,
     },
 });
 
@@ -124,7 +149,11 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         updateRiskAssessmentSchedule,
         getRiskAssessmentSchedule,
     } = useRiskAssessmentSchedule();
+
     const { formatDueDate } = buildingRiskAssessmentUtils();
+    const [hazardIndex, setHazardIndex] = useState(-1);
+    const { hazardModel } = useHazard();
+    const [hazardDetails, setHazardDetails] = useState({ ...hazardModel });
 
     const [scheduleEditorOpen, setScheduleEditorOpen] = useState(false);
 
@@ -143,6 +172,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     const [mode, setMode] = useState('date');
+    const [modalOpen, setModalOpen] = useState(false);
 
     const [showDateTimePicker, setShowDateTimePicker] = useState(false);
 
@@ -179,7 +209,6 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     }, [riskAssessmentScheduleModel]);
 
     useEffect(() => {
-        console.log(route.params);
         if (route.params.riskAssessmentId) {
             setRiskAssessmentScheduleModel((prevModel) => {
                 let updatedModel = { ...prevModel };
@@ -367,9 +396,131 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         });
     }
 
+    function handleLeaveHazardEditorPress() {
+        setModalOpen(false);
+    }
+
+    function handleSaveHazardPress(playground, index) {
+        const newHazard = {
+            description: playground.description,
+            directions: playground.directions,
+            riskCategory: playground.riskCategory,
+            riskImpact: playground.riskImpact,
+        };
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
+            const updatedPlayground = { ...prevPlayground };
+            if (!updatedPlayground.hazards) {
+                updatedPlayground.hazards = [newHazard];
+            } else {
+                if (index === -1) {
+                    updatedPlayground.hazards = [
+                        ...updatedPlayground.hazards,
+                        newHazard,
+                    ];
+                } else {
+                    updatedPlayground.hazards[index] = newHazard;
+                }
+            }
+            return updatedPlayground;
+        });
+        setModalOpen(false);
+    }
+
+    function handleAddScreenerPress() {
+        const newScreener = {
+            question: '',
+            response: 'EMPTY',
+        };
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
+            const updatedPlayground = { ...prevPlayground };
+            if (updatedPlayground.screeners) {
+                updatedPlayground.screeners = [
+                    ...updatedPlayground.screeners,
+                    newScreener,
+                ];
+            } else {
+                updatedPlayground.screeners = [newScreener];
+            }
+            return updatedPlayground;
+        });
+    }
+
+    function handleAddHazardPress() {
+        setModalOpen(true);
+    }
+
+    function handleRemoveScreener(index) {
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
+            const updatedPlayground = { ...prevPlayground };
+            updatedPlayground.screeners.splice(index, 1);
+            return updatedPlayground;
+        });
+    }
+
+    function handleOnChangeScreenerText(value, index) {
+        const updatedQuestionText = value;
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
+            const updatedPlayground = { ...prevPlayground };
+            updatedPlayground.screeners[index].question = updatedQuestionText;
+            return updatedPlayground;
+        });
+    }
+
+    function handleHazardEditPress(index) {
+        setHazardIndex(index);
+        const details = riskAssessmentSchedulePlayground.hazards[index];
+        setHazardDetails(details);
+        setModalOpen(true);
+    }
+
+    function handleHazardRemovePress(index) {
+        setRiskAssessmentSchedulePlayground((prevPlayground) => {
+            const updatedPlayground = { ...prevPlayground };
+            updatedPlayground.hazards.splice(index, 1);
+            return updatedPlayground;
+        });
+    }
+
+    function renderHazards() {
+        return riskAssessmentSchedulePlayground.hazards.map((hazard, index) => (
+            <Hazard
+                key={index}
+                hazard={hazard}
+                index={index}
+                isRiskAssessmentView={true}
+                onEditPress={handleHazardEditPress}
+                onRemoveHazard={handleHazardRemovePress}
+            />
+        ));
+    }
+
+    function renderScreeners() {
+        return riskAssessmentSchedulePlayground.screeners.map(
+            (screener, index) => (
+                <Screener
+                    key={index}
+                    questionText={screener.question}
+                    onChangeText={handleOnChangeScreenerText}
+                    onRemoveScreener={handleRemoveScreener}
+                    isRiskAssessmentView={false}
+                    screenerIndex={index}
+                />
+            )
+        );
+    }
+
     return (
         <ScrollView style={styles.screenContainer}>
             <Error errorMessage={error} />
+            <Modal visible={modalOpen} animationType={'slide'}>
+                <HazardEditor
+                    leaveHazardEditorPress={handleLeaveHazardEditorPress}
+                    isMaintenanceView={false}
+                    handleOnSavePress={handleSaveHazardPress}
+                    hazardDetails={hazardDetails}
+                    index={hazardIndex}
+                />
+            </Modal>
             <View style={styles.sectionContainer}>
                 <View style={styles.row}>
                     {!scheduleEditorOpen ? (
@@ -391,7 +542,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                 onPress={handleCancelSchedulePress}>
                                 <Icon
                                     name={'close'}
-                                    style={styles.iconButtonStyle}
+                                    style={styles.iconStyle}
                                     size={21}
                                 />
                             </TouchableOpacity>
@@ -400,7 +551,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                 onPress={handleSaveSchedulePress}>
                                 <Icon
                                     name={'save'}
-                                    style={styles.iconButtonStyle}
+                                    style={styles.iconStyle}
                                     size={22}
                                 />
                             </TouchableOpacity>
@@ -492,6 +643,45 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                     )
                                 }
                             />
+                        </View>
+                        <View style={styles.sectionContainer}>
+                            <Text style={styles.headerAlignment}>
+                                Assessment Questions
+                            </Text>
+                            <View style={styles.row}>
+                                <TouchableOpacity
+                                    onPress={handleAddScreenerPress}
+                                    style={styles.iconButton}>
+                                    <Icon
+                                        name="add"
+                                        size={22}
+                                        style={styles.iconStyle}
+                                    />
+                                    <Text style={styles.iconButtonText}>
+                                        Screening question
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={handleAddHazardPress}
+                                    style={styles.iconButton}>
+                                    <Icon
+                                        name="add"
+                                        size={22}
+                                        style={styles.iconStyle}
+                                    />
+                                    <Text style={styles.iconButtonText}>
+                                        Hazard
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        <View style={styles.sectionContainer}>
+                            {riskAssessmentSchedulePlayground.screeners
+                                ? renderScreeners()
+                                : null}
+                            {riskAssessmentSchedulePlayground.hazards
+                                ? renderHazards()
+                                : null}
                         </View>
                     </>
                 ) : null}

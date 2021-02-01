@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-ionicons';
-import HazardEditor from '../../riskassessment/components/HazardEditor';
+import HazardEditor from '../../buildingriskassessment/components/HazardEditor';
 import { DARK_BLUE, LIGHT_TEAL } from '../../common/styles/Colors';
 
 const styles = StyleSheet.create({
