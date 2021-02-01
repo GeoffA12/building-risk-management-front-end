@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     },
 });
 
-const RiskAssessmentListScreen = ({ navigation }) => {
+const RiskAssessmentListScreen = ({ navigation, route }) => {
     const {
         auth: { logout },
         user,
@@ -55,7 +55,7 @@ const RiskAssessmentListScreen = ({ navigation }) => {
     const [pickerOptions, setPickerOptions] = useState(getInitialPickerState());
 
     useEffect(() => {
-        // loadRiskAssessments(user.associatedSiteIds);
+        loadRiskAssessments(user.associatedSiteIds);
         loadPickerCallback(user.associatedSiteIds);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -66,9 +66,16 @@ const RiskAssessmentListScreen = ({ navigation }) => {
 
     useEffect(() => {
         setListHeader(navigation, handleAddRiskAssessmentPress, logout);
-        loadRiskAssessments(user.associatedSiteIds);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigation, logout]);
+
+    useEffect(() => {
+        if (route.params && route.params.refresh) {
+            loadRiskAssessments(user.associatedSiteIds);
+            loadPickerCallback(user.associatedSiteIds);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route]);
 
     useEffect(() => {
         if (riskAssessments && riskAssessments.length > 0) {

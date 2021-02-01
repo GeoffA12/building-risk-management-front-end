@@ -169,8 +169,8 @@ const RiskAssessmentEditorScreen = ({
             console.error(riskAssessmentResponse.error);
             setError(riskAssessmentResponse.error.message);
         } else {
-            navigation.navigate(navigationRoutes.RISKASSESSMENTEDITOR, {
-                riskAssessmentId: riskAssessmentResponse.data.id,
+            navigation.navigate(navigationRoutes.RISKASSESSMENTLIST, {
+                refresh: true,
             });
         }
     }

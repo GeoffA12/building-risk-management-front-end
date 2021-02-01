@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     },
 });
 
-const BuildingRiskAssessmentListScreen = ({ navigation }) => {
+const BuildingRiskAssessmentListScreen = ({ navigation, route }) => {
     const {
         auth: { logout },
         user,
@@ -63,6 +63,14 @@ const BuildingRiskAssessmentListScreen = ({ navigation }) => {
         setListHeader(navigation, handleAddBuildingRiskAssessmentPress, logout);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigation, logout]);
+
+    useEffect(() => {
+        if (route.params && route.params.refresh) {
+            loadBuildingRiskAssessments();
+            loadBuildings(user.associatedSiteIds);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route]);
 
     useEffect(() => {
         if (authenticatedBuildings.length > 0) {

@@ -66,24 +66,6 @@ export const useBuildingRiskAssessment = () => {
         return bulidingRiskAssessmentResponse;
     }
 
-    async function getBuildings(associatedSiteIds) {
-        let buildings;
-        let buildingsResponse = { ...responseObject };
-        try {
-            buildings = await loadData(
-                `${BASE_URL}/getBuildingsBySite`,
-                'POST',
-                {
-                    associatedSiteIds: associatedSiteIds,
-                }
-            );
-            buildingsResponse.data = buildings;
-        } catch (e) {
-            buildingsResponse.error = e;
-        }
-        return buildingsResponse;
-    }
-
     async function getSiteMaintenanceAssociates(associatedSiteIds) {
         let siteMaintenanceAssociates;
         let siteMaintenanceAssociatesResponse = { ...responseObject };
@@ -133,16 +115,31 @@ export const useBuildingRiskAssessment = () => {
         return buildingRiskAssessmentResponse;
     }
 
+    async function deleteBuildingRiskAssessment(id, publisherId) {
+        let deletedBuildingRiskAssessment;
+        let deletedBuildingRiskAssessmentResponse = { ...responseObject };
+        try {
+            deletedBuildingRiskAssessment = await loadData(
+                `${BASE_URL}/deleteBuildingRiskAssessment?id=${id}&publisherId=${publisherId}`,
+                'DELETE'
+            );
+            deletedBuildingRiskAssessmentResponse.data = deletedBuildingRiskAssessment;
+        } catch (e) {
+            deletedBuildingRiskAssessmentResponse.error = e;
+        }
+        return deletedBuildingRiskAssessmentResponse;
+    }
+
     return {
         buildingRiskAssessmentModel,
         setBuildingRiskAssessmentModel,
         riskAssessmentModel,
         setRiskAssessmentModel,
         getBuildingRiskAssessments,
-        getBuildings,
         getSiteMaintenanceAssociates,
         saveBuildingRiskAssessment,
         getBuildingRiskAssessment,
         getInitialPickerState,
+        deleteBuildingRiskAssessment,
     };
 };

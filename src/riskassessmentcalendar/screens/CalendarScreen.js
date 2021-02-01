@@ -75,6 +75,7 @@ const CalendarScreen = ({ navigation }) => {
             );
             setAgendaItems(formattedSchedules);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [riskAssessmentScheduleList]);
 
     async function loadSiteMaintenanceAssociate() {

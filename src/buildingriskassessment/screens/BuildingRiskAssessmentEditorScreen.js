@@ -21,8 +21,10 @@ import EntityStatus from '../../common/components/EntityStatus';
 import RiskAssessmentSchedule from '../components/RiskAssessmentSchedule';
 import { useBuildingRiskAssessment } from '../hooks/BuildingRiskAssessmentHooks';
 import { useRiskAssessment } from '../../riskassessment/hooks/RiskAssessmentHooks';
+import { useBuilding } from '../hooks/BuildingHooks';
 import { useRiskAssessmentSchedule } from '../hooks/RiskAssessmentScheduleHooks';
 import { useAPI } from '../../common/hooks/API';
+import { entityTrailUtils } from '../../utils/EntityTrail';
 import { buildingRiskAssessmentUtils } from '../utils/BuildingRiskAssessmentUtils';
 import {
     LIGHT_TEAL,
@@ -54,8 +56,8 @@ const styles = StyleSheet.create({
         margin: 3,
         borderRadius: 10,
         flexDirection: 'row',
-        alignItems: 'stretch',
-        padding: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     iconButtonText: {
         color: `${LIGHT_GRAY}`,
@@ -74,8 +76,8 @@ const styles = StyleSheet.create({
     },
     iconStyle: {
         color: `${LIGHT_GRAY}`,
-        paddingVertical: 3,
-        paddingHorizontal: 4,
+        padding: 4,
+        marginHorizontal: 6,
     },
     inputRow: {
         margin: 6,
@@ -131,6 +133,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         getBuildings,
         saveBuildingRiskAssessment,
         getBuildingRiskAssessment,
+        deleteBuildingRiskAssessment,
     } = useBuildingRiskAssessment();
     const { riskAssessmentModel, getRiskAssessments } = useRiskAssessment();
     const {
@@ -139,12 +142,11 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         deleteRiskAssessmentSchedule,
         attachBuildingRiskAssessmentIdToRiskAssessmentSchedules,
     } = useRiskAssessmentSchedule();
+    const { getBuildingsByAssociatedSiteIds } = useBuilding();
     const { error, setError, loading, setLoading } = useAPI();
+    const { getUserLastUpdatedId } = entityTrailUtils();
 
-    const {
-        formatRiskAssessmentSchedules,
-        formatDueDate,
-    } = buildingRiskAssessmentUtils();
+    const { formatRiskAssessmentSchedules } = buildingRiskAssessmentUtils();
 
     const [
         buildingRiskAssessmentPlayground,
@@ -162,6 +164,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     ] = useState([]);
 
     const [riskAssessments, setRiskAssessments] = useState([]);
+    const [hasDeletePermissions, setHasDeletePermissions] = useState(false);
 
     const [selectedBuilding, setSelectedBuilding] = useState('0');
     const [buildings, setBuildings] = useState([]);
@@ -207,6 +210,14 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             cloneDeep(buildingRiskAssessmentModel)
         );
         setSelectedBuilding(buildingRiskAssessmentModel.buildingId);
+        if (
+            buildingRiskAssessmentModel.publisherId &&
+            buildingRiskAssessmentModel.publisherId === user.id
+        ) {
+            setHasDeletePermissions(true);
+        } else {
+            setHasDeletePermissions(false);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [buildingRiskAssessmentModel]);
 
@@ -334,7 +345,9 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
 
     async function loadBuildings() {
         setLoading(true);
-        const buildingResponse = await getBuildings(user.associatedSiteIds);
+        const buildingResponse = await getBuildingsByAssociatedSiteIds(
+            user.associatedSiteIds
+        );
         setLoading(false);
         if (buildingResponse.data) {
             setBuildings(buildingResponse.data);
@@ -393,8 +406,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         });
     }
 
-    // TODO: After saving the building assessment (confirm that the right risk assessment id's are maintained), make sure to use the attach BRA id to
-    // risk assessment schedules API so that we can search for all RA schedules when this page loads in read/updated mode.
     async function handleSaveBuildingAssessment() {
         let uri;
         let inputObject;
@@ -461,6 +472,24 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                     }
                 );
             }
+        }
+    }
+
+    async function handleDeleteBuildingAssessment() {
+        setLoading(true);
+        const deletedBuildingRiskAssessmentResponse = await deleteBuildingRiskAssessment(
+            buildingRiskAssessmentPlayground.id,
+            user.id
+        );
+        setLoading(false);
+        if (!deletedBuildingRiskAssessmentResponse.data) {
+            console.error(deletedBuildingRiskAssessmentResponse.error);
+            setError(deletedBuildingRiskAssessmentResponse.error.message);
+        } else {
+            console.log(deletedBuildingRiskAssessmentResponse.data);
+            navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTLIST, {
+                refresh: true,
+            });
         }
     }
 
@@ -631,6 +660,23 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                         <Icon name="save" size={22} style={styles.iconStyle} />
                         <Text style={styles.iconButtonText}>Save</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={handleDeleteBuildingAssessment}
+                        style={
+                            hasDeletePermissions &&
+                            buildingRiskAssessmentPlayground.id
+                                ? styles.iconButton
+                                : styles.disabledIconButton
+                        }
+                        disabled={
+                            !(
+                                hasDeletePermissions &&
+                                buildingRiskAssessmentPlayground.id
+                            )
+                        }>
+                        <Icon name="trash" size={22} style={styles.iconStyle} />
+                        <Text style={styles.iconButtonText}>Delete</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
             {route.params.buildingRiskAssessmentId &&
@@ -638,12 +684,9 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             buildingRiskAssessmentPlayground.entityTrail.length > 0 ? (
                 <EntityStatus
                     entityName={'Building Assessment'}
-                    publisherId={
-                        buildingRiskAssessmentPlayground.entityTrail[
-                            buildingRiskAssessmentPlayground.entityTrail
-                                .length - 1
-                        ].userId
-                    }
+                    publisherId={getUserLastUpdatedId(
+                        buildingRiskAssessmentPlayground
+                    )}
                     updatedAt={buildingRiskAssessmentPlayground.updatedAt}
                 />
             ) : null}
