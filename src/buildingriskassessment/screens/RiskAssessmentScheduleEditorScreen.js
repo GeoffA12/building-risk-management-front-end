@@ -7,6 +7,7 @@ import {
     Text,
     Platform,
     Modal,
+    Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import cloneDeep from 'lodash/cloneDeep';
@@ -445,6 +446,24 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         });
     }
 
+    function handleInformationPress() {
+        return Alert.alert(
+            'Screening questions and Hazards',
+            'Screening questions are yes/no questions attached to maintenance schedules which should ensure that working conditions are safe and the associate assigned to the' +
+                ' assessment has the correct site permissions.' +
+                '\n\n' +
+                'Each hazard should have a description of the hazard itself, what the risk impact of the hazard ocurring on-site, the risk category ' +
+                'of the hazard, and specific directions given to the maintenance associate who will fulfill this assessment schedule.',
+
+            [
+                {
+                    text: 'OK',
+                },
+            ],
+            { cancelable: false }
+        );
+    }
+
     function handleAddHazardPress() {
         setModalOpen(true);
     }
@@ -648,6 +667,17 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                             <Text style={styles.headerAlignment}>
                                 Assessment Questions
                             </Text>
+                            <View style={styles.row}>
+                                <TouchableOpacity
+                                    onPress={handleInformationPress}
+                                    style={styles.iconButton}>
+                                    <Icon
+                                        name="information-circle"
+                                        size={22}
+                                        style={styles.iconStyle}
+                                    />
+                                </TouchableOpacity>
+                            </View>
                             <View style={styles.row}>
                                 <TouchableOpacity
                                     onPress={handleAddScreenerPress}
