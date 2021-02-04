@@ -3,14 +3,14 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '10.0'
 
-target 'BuildingRiskManagementFrontEnd' do
+target 'BuildingAssessorPro' do
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
-  target 'BuildingRiskManagementFrontEndTests' do
+  target 'BuildingAssessorProTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -25,10 +25,10 @@ target 'BuildingRiskManagementFrontEnd' do
   end
 end
 
-target 'BuildingRiskManagementFrontEnd-tvOS' do
-  # Pods for BuildingRiskManagementFrontEnd-tvOS
+target 'BuildingAssessorPro-tvOS' do
+  # Pods for BuildingAssessorPro-tvOS
 
-  target 'BuildingRiskManagementFrontEnd-tvOSTests' do
+  target 'BuildingAssessorPro-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end

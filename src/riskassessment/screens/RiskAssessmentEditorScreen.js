@@ -15,6 +15,7 @@ import Loading from '../../common/components/Loading';
 import Error from '../../common/components/Error';
 import { navigationRoutes } from '../../config/NavConfig';
 import { useRiskAssessment } from '../hooks/RiskAssessmentHooks';
+import { useNotifications } from '../../common/hooks/Notifications';
 import { useAPI } from '../../common/hooks/API';
 import {
     LIGHT_TEAL,
@@ -114,6 +115,7 @@ const RiskAssessmentEditorScreen = ({
 
     const [isDirty, setIsDirty] = useState(true);
     const [hasDeletePermissions, setHasDeletePermissions] = useState(false);
+    const { createScheduledNotification } = useNotifications();
 
     useEffect(() => {
         if (route && route.params && route.params.riskAssessmentId) {
@@ -169,6 +171,11 @@ const RiskAssessmentEditorScreen = ({
             console.error(riskAssessmentResponse.error);
             setError(riskAssessmentResponse.error.message);
         } else {
+            createScheduledNotification(
+                'Risk assessment saved!',
+                'Your risk assessment was successfully saved.',
+                1
+            );
             navigation.navigate(navigationRoutes.RISKASSESSMENTLIST, {
                 refresh: true,
             });
@@ -186,7 +193,10 @@ const RiskAssessmentEditorScreen = ({
             console.error(deletedRiskAssessmentResponse.error);
             setError(deletedRiskAssessmentResponse.error.message);
         } else {
-            // TODO: Might want to use Confirmation.js
+            createScheduledNotification(
+                'Risk assessment deleted.',
+                'Your risk assessment was successfully deleted.'
+            );
             navigation.navigate(navigationRoutes.RISKASSESSMENTLIST);
         }
     }

@@ -6,6 +6,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     View,
+    Alert,
 } from 'react-native';
 import Icon from 'react-native-ionicons';
 import cloneDeep from 'lodash/cloneDeep';
@@ -70,6 +71,13 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         padding: 5,
         width: '30%',
+    },
+    informationIconButton: {
+        backgroundColor: `${DARK_BLUE}`,
+        borderRadius: 10,
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        padding: 5,
     },
     iconButtonText: {
         color: `${LIGHT_GRAY}`,
@@ -141,6 +149,41 @@ const HazardEditor = ({
         return options;
     }
 
+    function handleInformationPress() {
+        return Alert.alert(
+            'Risk category examples',
+            'Atmospheric: Weather extremes, high humidity, dust, or dangerous gases.' +
+                '\n\n' +
+                'Biological: Baterial virus hazards, pest or wildlife safety hazards.' +
+                '\n\n' +
+                'Chemical: Presence of heavy metals, acids, bases, poisons, or fumes.' +
+                '\n\n' +
+                'Electrical: Electrical hazards, faulty wiring, exposed earthing points, or static shock danger.' +
+                '\n\n' +
+                'Environmental: Confined and dangerous working space, loud noises, extreme temperatures, bad ligthing.' +
+                '\n\n' +
+                'External: General Public safety hazards, traffic or construction hazards at site' +
+                '\n\n' +
+                'Fire: Open flames, combustible materials, chemical reactions which could create fire explosions' +
+                '\n\n' +
+                'Gravitational: Falling objects, heavy objects, objects on site that can be tripped on' +
+                '\n\n' +
+                'Manual Handling: Heavy lifting and pushing hazards, twisting or awkward positions operating site machinery' +
+                '\n\n' +
+                'Mechanical: Machinery hazards including potential for entaglement, stabbing, crushing, or abrasions.' +
+                '\n\n' +
+                'Pressure: Air, water, gas, oil, or extreme high/low pressure hazards on site' +
+                '\n\n' +
+                'Thermal: Hot or cold surfaces, liquids, or steam hazards on site.',
+            [
+                {
+                    text: 'OK',
+                },
+            ],
+            { cancelable: false }
+        );
+    }
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.row}>
@@ -186,6 +229,17 @@ const HazardEditor = ({
                         editable={!isMaintenanceView}
                     />
                 </View>
+            </View>
+            <View style={styles.row}>
+                <TouchableOpacity
+                    onPress={handleInformationPress}
+                    style={styles.informationIconButton}>
+                    <Icon
+                        name="information-circle"
+                        size={22}
+                        style={styles.iconStyle}
+                    />
+                </TouchableOpacity>
             </View>
             <View style={styles.row}>
                 <View style={styles.pickerRowContainer}>

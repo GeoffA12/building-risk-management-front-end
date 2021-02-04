@@ -7,6 +7,7 @@ import {
     Text,
     Platform,
     Modal,
+    Alert,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import cloneDeep from 'lodash/cloneDeep';
@@ -26,6 +27,7 @@ import { useBuildingRiskAssessment } from '../hooks/BuildingRiskAssessmentHooks'
 import { useRiskAssessmentSchedule } from '../hooks/RiskAssessmentScheduleHooks';
 import { stringsEnum } from '../config/StringsEnum';
 import { useAPI } from '../../common/hooks/API';
+import { useNotifications } from '../../common/hooks/Notifications';
 import { buildingRiskAssessmentUtils } from '../utils/BuildingRiskAssessmentUtils';
 import {
     LIGHT_GRAY,
@@ -151,6 +153,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     } = useRiskAssessmentSchedule();
 
     const { formatDueDate } = buildingRiskAssessmentUtils();
+    const { createScheduledNotification } = useNotifications();
     const [hazardIndex, setHazardIndex] = useState(-1);
     const { hazardModel } = useHazard();
     const [hazardDetails, setHazardDetails] = useState({ ...hazardModel });
@@ -311,6 +314,8 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             if (!updateRiskAssessmentScheduleResponse.data) {
                 console.error(updateRiskAssessmentScheduleResponse.error);
                 setError(updateRiskAssessmentScheduleResponse.error.message);
+                setLoading(false);
+                return;
             } else {
                 riskAssessmentScheduleIdToFetch =
                     updateRiskAssessmentScheduleResponse.data.id;
@@ -323,12 +328,19 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             if (!createRiskAssessmentScheduleResponse.data) {
                 console.error(createRiskAssessmentScheduleResponse.error);
                 setError(createRiskAssessmentScheduleResponse.error.message);
+                setLoading(false);
+                return;
             } else {
                 riskAssessmentScheduleIdToFetch =
                     createRiskAssessmentScheduleResponse.data.id;
             }
         }
         setLoading(false);
+        createScheduledNotification(
+            'Risk assessment schedule saved!',
+            'Your risk assessment schedule was successfully saved.',
+            1
+        );
         navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
             buildingRiskAssessmentId: route.params.buildingRiskAssessmentId,
             riskAssessmentId: route.params.riskAssessmentId,
@@ -443,6 +455,24 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             }
             return updatedPlayground;
         });
+    }
+
+    function handleInformationPress() {
+        return Alert.alert(
+            'Screening questions and Hazards',
+            'Screening questions are yes/no questions attached to maintenance schedules which should ensure that working conditions are safe and the associate assigned to the' +
+                ' assessment has the correct site permissions.' +
+                '\n\n' +
+                'Each hazard should have a description of the hazard itself, what the risk impact of the hazard ocurring on-site, the risk category ' +
+                'of the hazard, and specific directions given to the maintenance associate who will fulfill this assessment schedule.',
+
+            [
+                {
+                    text: 'OK',
+                },
+            ],
+            { cancelable: false }
+        );
     }
 
     function handleAddHazardPress() {
@@ -648,6 +678,17 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                             <Text style={styles.headerAlignment}>
                                 Assessment Questions
                             </Text>
+                            <View style={styles.row}>
+                                <TouchableOpacity
+                                    onPress={handleInformationPress}
+                                    style={styles.iconButton}>
+                                    <Icon
+                                        name="information-circle"
+                                        size={22}
+                                        style={styles.iconStyle}
+                                    />
+                                </TouchableOpacity>
+                            </View>
                             <View style={styles.row}>
                                 <TouchableOpacity
                                     onPress={handleAddScreenerPress}
