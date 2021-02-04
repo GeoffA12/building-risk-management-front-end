@@ -25,6 +25,7 @@ import { useBuilding } from '../hooks/BuildingHooks';
 import { useRiskAssessmentSchedule } from '../hooks/RiskAssessmentScheduleHooks';
 import { useAPI } from '../../common/hooks/API';
 import { entityTrailUtils } from '../../utils/EntityTrail';
+import { useNotifications } from '../../common/hooks/Notifications';
 import { buildingRiskAssessmentUtils } from '../utils/BuildingRiskAssessmentUtils';
 import {
     LIGHT_TEAL,
@@ -145,6 +146,10 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     const { getBuildingsByAssociatedSiteIds } = useBuilding();
     const { error, setError, loading, setLoading } = useAPI();
     const { getUserLastUpdatedId } = entityTrailUtils();
+    const {
+        showNotification,
+        createScheduledNotification,
+    } = useNotifications();
 
     const { formatRiskAssessmentSchedules } = buildingRiskAssessmentUtils();
 
@@ -464,6 +469,10 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                 console.log(
                     attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse.data
                 );
+                showNotification(
+                    'Building risk assessment saved!',
+                    'Your building risk assessment has been successfully saved. Go back to list screen and refresh to view it in the list.'
+                );
                 navigation.navigate(
                     navigationRoutes.BUILDINGRISKASSESSMENTEDITOR,
                     {
@@ -487,6 +496,11 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             setError(deletedBuildingRiskAssessmentResponse.error.message);
         } else {
             console.log(deletedBuildingRiskAssessmentResponse.data);
+            createScheduledNotification(
+                'Building risk assessment successfully deleted.',
+                'Your building risk assessment was successfully removed from this site.',
+                1
+            );
             navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTLIST, {
                 refresh: true,
             });

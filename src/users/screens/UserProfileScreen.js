@@ -13,9 +13,9 @@ import Error from '../../common/components/Error';
 import Loading from '../../common/components/Loading';
 import AuthContext from '../../auth/contexts/AuthContext';
 import FormInput from '../../common/components/FormInput';
-import Confirmation from '../../common/components/Confirmation';
 import StyledButton from '../../common/components/StyledButton';
 import AuthenticatedSite from '../components/AuthenticatedSite';
+import { useNotifications } from '../../common/hooks/Notifications';
 import { useUser } from '../hooks/UserHooks';
 import {
     DARK_BLUE,
@@ -103,8 +103,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     enterButton: {
-        width: '45%',
-        padding: 2,
+        width: '55%',
+        padding: 3,
+    },
+    notificationButtonText: {
+        fontSize: 17,
+        color: `${LIGHT_TEAL}`,
     },
 });
 
@@ -122,18 +126,13 @@ const UserProfileScreen = ({ navigation }) => {
         authenticateUserPassword,
     } = useUser();
     const { error, setError, loading, setLoading } = useAPI();
+    const { cancelAllNotifications, showNotification } = useNotifications();
     const [newPassword, setNewPassword] = useState('');
     const [isDirty, setIsDirty] = useState(false);
     const [
         authenticationErrorMessage,
         setAuthenticationErrorMessage,
     ] = useState('');
-    const [showConfirmation, setShowConfirmation] = useState(false);
-    const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(
-        false
-    );
-    const [confirmationMessage, setConfirmationMessage] = useState('');
-    const [confirmationTitle, setConfirmationTitle] = useState('');
 
     useEffect(() => {
         loadUserProfile();
@@ -201,10 +200,9 @@ const UserProfileScreen = ({ navigation }) => {
                 console.error(userProfileResponse.error);
                 setError(userProfileResponse.error.message);
             } else {
-                setShowConfirmation(true);
-                setConfirmationTitle('User profile saved!');
-                setConfirmationMessage(
-                    'Your user profile has been successfully saved.'
+                showNotification(
+                    'User profile successfully saved!',
+                    'Your user profile has been updated.'
                 );
                 setUserModel(userProfileResponse.data);
             }
@@ -227,13 +225,18 @@ const UserProfileScreen = ({ navigation }) => {
                 setShowNewPassword(true);
                 setOldPasswordAttempt('');
                 setAuthenticationErrorMessage('');
-                setShowPasswordConfirmation(true);
-                setConfirmationMessage('You may now enter new password.');
-                setConfirmationTitle('Old password confirmed.');
+                showNotification(
+                    'Old password successful!',
+                    'You may now enter your new password and save your profile.'
+                );
             } else {
                 setAuthenticationErrorMessage('Wrong password.');
             }
         }
+    }
+
+    function handleClearAllNotificationsPress() {
+        cancelAllNotifications();
     }
 
     function handleUserModelPlaygroundChange(fieldKey, value) {
@@ -244,30 +247,9 @@ const UserProfileScreen = ({ navigation }) => {
         });
     }
 
-    function handleConfirmationClose() {
-        if (showConfirmation === true) {
-            setShowConfirmation((prevConfirmation) => {
-                return !prevConfirmation;
-            });
-        } else if (showPasswordConfirmation === true) {
-            setShowPasswordConfirmation((prevPasswordConfirmation) => {
-                return !prevPasswordConfirmation;
-            });
-        }
-    }
-
     return (
         <ScrollView style={styles.container}>
             <Error errorMessage={error} />
-            <View style={styles.sectionContainer}>
-                {showConfirmation ? (
-                    <Confirmation
-                        title={confirmationTitle}
-                        message={confirmationMessage}
-                        handleConfirmationClose={handleConfirmationClose}
-                    />
-                ) : null}
-            </View>
             <View style={styles.sectionContainer}>
                 <View style={styles.row}>
                     <View style={styles.cell}>
@@ -302,6 +284,17 @@ const UserProfileScreen = ({ navigation }) => {
                         <Text style={styles.subTitleText}>
                             Role: {SiteRoles[user.siteRole].textField}
                         </Text>
+                    </View>
+                </View>
+                <View style={styles.row}>
+                    <View style={styles.cell}>
+                        <StyledButton
+                            title={'Clear all notifications'}
+                            onPress={handleClearAllNotificationsPress}
+                            disabled={false}
+                            style={styles.enterButton}
+                            textStyle={styles.notificationButtonText}
+                        />
                     </View>
                 </View>
             </View>
@@ -388,13 +381,6 @@ const UserProfileScreen = ({ navigation }) => {
                     </View>
                 </View>
             </View>
-            {showPasswordConfirmation ? (
-                <Confirmation
-                    title={confirmationTitle}
-                    message={confirmationMessage}
-                    handleConfirmationClose={handleConfirmationClose}
-                />
-            ) : null}
             <View style={styles.sectionContainer}>
                 <View style={styles.row}>
                     <View style={styles.cell}>

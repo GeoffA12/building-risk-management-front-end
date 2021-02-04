@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Heading from '../../common/components/Heading';
 import FormInput from '../../common/components/FormInput';
 import StyledButton from '../../common/components/StyledButton';
@@ -8,7 +8,6 @@ import AuthContainer from '../../users/components/AuthContainer';
 import { navigationRoutes } from '../../config/NavConfig';
 import AuthContext from '../contexts/AuthContext';
 import Loading from '../../common/components/Loading';
-import Confirmation from '../../common/components/Confirmation';
 import { DARK_BLUE } from '../../common/styles/Colors';
 import { useNotifications } from '../../common/hooks/Notifications';
 
@@ -66,7 +65,6 @@ const LoginScreen = ({ navigation, route }) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [showConfirmation, setShowConfirmation] = useState(false);
 
     useEffect(() => {
         if (route.params && route.params.isRegistered) {
@@ -87,14 +85,6 @@ const LoginScreen = ({ navigation, route }) => {
             setError(e.message);
             setLoading(false);
             return;
-        }
-    }
-
-    function handleConfirmationClose() {
-        if (showConfirmation === true) {
-            setShowConfirmation((prevShowConfirmation) => {
-                return !prevShowConfirmation;
-            });
         }
     }
 

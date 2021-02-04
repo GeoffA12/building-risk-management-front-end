@@ -16,8 +16,7 @@ export const useNotifications = () => {
             channelId: channelConfig.channelId,
             title,
             message,
-            date: new Date(Date.now() * seconds * 1000),
-            vibration: 300,
+            date: new Date(Date.now() + seconds * 1000),
         });
     }
 

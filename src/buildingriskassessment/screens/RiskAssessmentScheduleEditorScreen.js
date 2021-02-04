@@ -27,6 +27,7 @@ import { useBuildingRiskAssessment } from '../hooks/BuildingRiskAssessmentHooks'
 import { useRiskAssessmentSchedule } from '../hooks/RiskAssessmentScheduleHooks';
 import { stringsEnum } from '../config/StringsEnum';
 import { useAPI } from '../../common/hooks/API';
+import { useNotifications } from '../../common/hooks/Notifications';
 import { buildingRiskAssessmentUtils } from '../utils/BuildingRiskAssessmentUtils';
 import {
     LIGHT_GRAY,
@@ -152,6 +153,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     } = useRiskAssessmentSchedule();
 
     const { formatDueDate } = buildingRiskAssessmentUtils();
+    const { createScheduledNotification } = useNotifications();
     const [hazardIndex, setHazardIndex] = useState(-1);
     const { hazardModel } = useHazard();
     const [hazardDetails, setHazardDetails] = useState({ ...hazardModel });
@@ -312,6 +314,8 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             if (!updateRiskAssessmentScheduleResponse.data) {
                 console.error(updateRiskAssessmentScheduleResponse.error);
                 setError(updateRiskAssessmentScheduleResponse.error.message);
+                setLoading(false);
+                return;
             } else {
                 riskAssessmentScheduleIdToFetch =
                     updateRiskAssessmentScheduleResponse.data.id;
@@ -324,12 +328,19 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             if (!createRiskAssessmentScheduleResponse.data) {
                 console.error(createRiskAssessmentScheduleResponse.error);
                 setError(createRiskAssessmentScheduleResponse.error.message);
+                setLoading(false);
+                return;
             } else {
                 riskAssessmentScheduleIdToFetch =
                     createRiskAssessmentScheduleResponse.data.id;
             }
         }
         setLoading(false);
+        createScheduledNotification(
+            'Risk assessment schedule saved!',
+            'Your risk assessment schedule was successfully saved.',
+            2
+        );
         navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
             buildingRiskAssessmentId: route.params.buildingRiskAssessmentId,
             riskAssessmentId: route.params.riskAssessmentId,
