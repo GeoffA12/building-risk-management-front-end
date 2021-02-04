@@ -28,7 +28,7 @@ const CalendarScreen = ({ navigation }) => {
         auth: { logout },
         user,
     } = useContext(AuthContext);
-    const { setCalendarHeader } = useHeader({ user });
+    const { setCalendarHeader } = useHeader();
     const {
         riskAssessmentScheduleList,
         setRiskAssessmentScheduleList,

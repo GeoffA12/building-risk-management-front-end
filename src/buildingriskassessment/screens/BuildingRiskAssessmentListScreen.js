@@ -130,7 +130,6 @@ const BuildingRiskAssessmentListScreen = ({ navigation, route }) => {
             console.error(buildingsAtSiteResponse.error);
             setError(buildingsAtSiteResponse.error.message);
         } else {
-            console.log(buildingsAtSiteResponse);
             setAuthenticatedBuildings(buildingsAtSiteResponse.data);
         }
     }
@@ -143,7 +142,6 @@ const BuildingRiskAssessmentListScreen = ({ navigation, route }) => {
     }
 
     function handleFilterChange(val) {
-        console.log(val);
         if (
             val === filterOptions.INITIAL_VALUE.value ||
             val === filterOptions.ALL_BUILDING_ASSESSMENTS.value

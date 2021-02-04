@@ -28,6 +28,7 @@ import { useRiskAssessmentScheduleValidation } from '../utils/Validation';
 import { entityTrailUtils } from '../../utils/EntityTrail';
 import EnhancedPicker from '../../common/components/EnhancedPicker';
 import { navigationRoutes } from '../../config/NavConfig';
+import { useNotifications } from '../../common/hooks/Notifications';
 
 const styles = StyleSheet.create({
     container: {
@@ -152,6 +153,7 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         validateScreeners,
     } = useRiskAssessmentScheduleValidation();
     const { getUserLastUpdatedId } = entityTrailUtils();
+    const { showNotification } = useNotifications();
     const [isDirty, setIsDirty] = useState(false);
 
     useEffect(() => {
@@ -264,6 +266,10 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
             console.error(riskAssessmentScheduleResponse.error);
             setError(riskAssessmentScheduleResponse.error.message);
         } else {
+            showNotification(
+                'Maintenance asessment schedule saved!',
+                'Maintenance assessment schedule was successfully updated and saved. Go back to calendar screen and refresh to view updated on calendar.'
+            );
             navigation.navigate(
                 navigationRoutes.SMARISKASSESSMENTSCHEDULEEDITORSCREEN,
                 {

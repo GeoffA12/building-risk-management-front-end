@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Heading from '../../common/components/Heading';
 import FormInput from '../../common/components/FormInput';
 import StyledButton from '../../common/components/StyledButton';
@@ -8,9 +8,8 @@ import AuthContainer from '../../users/components/AuthContainer';
 import { navigationRoutes } from '../../config/NavConfig';
 import AuthContext from '../contexts/AuthContext';
 import Loading from '../../common/components/Loading';
-import Confirmation from '../../common/components/Confirmation';
 import { DARK_BLUE } from '../../common/styles/Colors';
-import { Platform } from 'react-native';
+import { useNotifications } from '../../common/hooks/Notifications';
 
 const styles = StyleSheet.create({
     container: {
@@ -59,17 +58,22 @@ const LoginScreen = ({ navigation, route }) => {
         auth: { login },
     } = useContext(AuthContext);
 
+    const { showNotification } = useNotifications();
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [showConfirmation, setShowConfirmation] = useState(false);
 
     useEffect(() => {
         if (route.params && route.params.isRegistered) {
-            setShowConfirmation(true);
+            showNotification(
+                'Registration successful!',
+                'You may now login with your username and password.'
+            );
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route]);
 
     async function handleLoginPress() {
@@ -84,25 +88,8 @@ const LoginScreen = ({ navigation, route }) => {
         }
     }
 
-    function handleConfirmationClose() {
-        if (showConfirmation === true) {
-            setShowConfirmation((prevShowConfirmation) => {
-                return !prevShowConfirmation;
-            });
-        }
-    }
-
     return (
         <AuthContainer>
-            {showConfirmation ? (
-                <View style={styles.confirmationRow}>
-                    <Confirmation
-                        title="Successfully registered!"
-                        message="You may now login."
-                        handleConfirmationClose={handleConfirmationClose}
-                    />
-                </View>
-            ) : null}
             <View style={styles.confirmationRow}>
                 <Heading>Login!</Heading>
             </View>

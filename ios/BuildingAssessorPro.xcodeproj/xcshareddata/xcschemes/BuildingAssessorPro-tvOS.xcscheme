@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "BuildingRiskManagementFrontEnd-tvOS.app"
-               BlueprintName = "BuildingRiskManagementFrontEnd-tvOS"
-               ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+               BuildableName = "BuildingAssessorPro-tvOS.app"
+               BlueprintName = "BuildingAssessorPro-tvOS"
+               ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "BuildingRiskManagementFrontEnd-tvOSTests.xctest"
-               BlueprintName = "BuildingRiskManagementFrontEnd-tvOSTests"
-               ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+               BuildableName = "BuildingAssessorPro-tvOSTests.xctest"
+               BlueprintName = "BuildingAssessorPro-tvOSTests"
+               ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "BuildingRiskManagementFrontEnd-tvOS.app"
-            BlueprintName = "BuildingRiskManagementFrontEnd-tvOS"
-            ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+            BuildableName = "BuildingAssessorPro-tvOS.app"
+            BlueprintName = "BuildingAssessorPro-tvOS"
+            ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "BuildingRiskManagementFrontEnd-tvOS.app"
-            BlueprintName = "BuildingRiskManagementFrontEnd-tvOS"
-            ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+            BuildableName = "BuildingAssessorPro-tvOS.app"
+            BlueprintName = "BuildingAssessorPro-tvOS"
+            ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

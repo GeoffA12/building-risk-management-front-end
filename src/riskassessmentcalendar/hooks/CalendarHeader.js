@@ -10,21 +10,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export const useHeader = ({ user }) => {
-    const {
-        getSiteMaintenanceAssociateById,
-        setAssignedRiskAssessmentScheduleIds,
-    } = useCalendarHooks();
-
-    async function loadRiskAssessmentSchedules() {
-        const siteMaintenanceAssociate = await getSiteMaintenanceAssociateById(
-            user.id
-        );
-        setAssignedRiskAssessmentScheduleIds(
-            siteMaintenanceAssociate.assignedRiskAssessmentScheduleIds
-        );
-    }
-
+export const useHeader = () => {
     function setCalendarHeader(
         navigation,
         logout,

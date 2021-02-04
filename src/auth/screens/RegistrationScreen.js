@@ -2,7 +2,7 @@ import React from 'react';
 import UserForm from '../../users/components/UserForm';
 import { navigationRoutes } from '../../config/NavConfig';
 
-const RegistrationScreen = ({ navigation, onCancelPress }) => {
+const RegistrationScreen = ({ navigation }) => {
     function handleExitFormPress(isRegistered) {
         navigation.navigate(navigationRoutes.LOGIN, {
             isRegistered: isRegistered,
