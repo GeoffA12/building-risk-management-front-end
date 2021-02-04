@@ -12,6 +12,7 @@ import BuildingRiskAssessmentEditorScreen from '../screens/BuildingRiskAssessmen
 import RiskAssessmentEditorScreen from '../../riskassessment/screens/RiskAssessmentEditorScreen';
 import RiskAssessmentScheduleEditorScreen from '../screens/RiskAssessmentScheduleEditorScreen';
 import UserProfileScreen from '../../users/screens/UserProfileScreen';
+import MaintenanceManagerCalendarScreen from '../screens/MaintenanceManagerCalendarScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 const SiteMaintenanceManagerDrawer = createDrawerNavigator();
@@ -169,6 +170,10 @@ const SiteMaintenanceManagerNavigator = () => {
             <SiteMaintenanceManagerDrawer.Screen
                 name={navigationRoutes.USERPROFILE}
                 component={UserProfileScreen}
+            />
+            <SiteMaintenanceManagerDrawer.Screen
+                name={navigationRoutes.MAINTENANCEMANAGERCALENDARSCREEN}
+                component={MaintenanceManagerCalendarScreen}
             />
         </SiteMaintenanceManagerDrawer.Navigator>
     );
