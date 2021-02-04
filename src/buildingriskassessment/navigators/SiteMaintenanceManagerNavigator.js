@@ -20,6 +20,7 @@ const SiteMaintenanceManagerDrawer = createDrawerNavigator();
 const SiteMaintenanceManagerStack = createStackNavigator();
 const RiskAssessmentStack = createStackNavigator();
 const SiteMaintenanceManagerTopTabs = createMaterialTopTabNavigator();
+const SiteMaintenanceManagerCalendarStack = createStackNavigator();
 
 const styles = StyleSheet.create({
     headerContainer: {
@@ -134,6 +135,21 @@ const SiteMaintenanceManagerNavigator = () => {
         );
     }
 
+    function createSiteMaintenanceManagerCalendarStack() {
+        return (
+            <SiteMaintenanceManagerCalendarStack.Navigator mode={'modal'}>
+                <SiteMaintenanceManagerCalendarStack.Screen
+                    name={navigationRoutes.MAINTENANCEMANAGERCALENDARSCREEN}
+                    component={MaintenanceManagerCalendarScreen}
+                    options={{
+                        title: 'Maintenance Calendar',
+                        headerTitleAlign: 'center',
+                    }}
+                />
+            </SiteMaintenanceManagerCalendarStack.Navigator>
+        );
+    }
+
     function createRiskAssessmentStack() {
         return (
             <SiteMaintenanceManagerStack.Navigator mode={'modal'}>
@@ -173,7 +189,7 @@ const SiteMaintenanceManagerNavigator = () => {
             />
             <SiteMaintenanceManagerDrawer.Screen
                 name={navigationRoutes.MAINTENANCEMANAGERCALENDARSCREEN}
-                component={MaintenanceManagerCalendarScreen}
+                children={createSiteMaintenanceManagerCalendarStack}
             />
         </SiteMaintenanceManagerDrawer.Navigator>
     );
