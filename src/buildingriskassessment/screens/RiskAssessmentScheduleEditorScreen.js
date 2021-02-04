@@ -339,7 +339,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         createScheduledNotification(
             'Risk assessment schedule saved!',
             'Your risk assessment schedule was successfully saved.',
-            2
+            1
         );
         navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTEDITOR, {
             buildingRiskAssessmentId: route.params.buildingRiskAssessmentId,
