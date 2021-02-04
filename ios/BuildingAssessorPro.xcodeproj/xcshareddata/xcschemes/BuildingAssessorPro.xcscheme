@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "BuildingRiskManagementFrontEnd.app"
-               BlueprintName = "BuildingRiskManagementFrontEnd"
-               ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+               BuildableName = "BuildingAssessorPro.app"
+               BlueprintName = "BuildingAssessorPro"
+               ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "BuildingRiskManagementFrontEndTests.xctest"
-               BlueprintName = "BuildingRiskManagementFrontEndTests"
-               ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+               BuildableName = "BuildingAssessorProTests.xctest"
+               BlueprintName = "BuildingAssessorProTests"
+               ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "BuildingRiskManagementFrontEnd.app"
-            BlueprintName = "BuildingRiskManagementFrontEnd"
-            ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+            BuildableName = "BuildingAssessorPro.app"
+            BlueprintName = "BuildingAssessorPro"
+            ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "BuildingRiskManagementFrontEnd.app"
-            BlueprintName = "BuildingRiskManagementFrontEnd"
-            ReferencedContainer = "container:BuildingRiskManagementFrontEnd.xcodeproj">
+            BuildableName = "BuildingAssessorPro.app"
+            BlueprintName = "BuildingAssessorPro"
+            ReferencedContainer = "container:BuildingAssessorPro.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
