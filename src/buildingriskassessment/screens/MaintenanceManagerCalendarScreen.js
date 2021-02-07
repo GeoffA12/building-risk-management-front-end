@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Agenda } from 'react-native-calendars';
-import { Avatar, Card } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import AuthContext from '../../auth/contexts/AuthContext';
 import { useCalendarHooks } from '../hooks/CalendarHooks.js';
 
@@ -21,9 +21,7 @@ const styles = StyleSheet.create({
 });
 
 const MaintenanceManagerCalendarScreen = ({ navigation }) => {
-    const {
-        user,
-    } = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
 
     const {
         getAssociatesRiskAssessmentSchedules,
@@ -37,9 +35,7 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
     const today = new Date().toISOString().slice(0, 10);
 
     useEffect(() => {
-        loadAssociatesRiskAssessmentSchedules(
-            user.id
-        );
+        loadAssociatesRiskAssessmentSchedules(user.id);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -65,8 +61,7 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
 
     const renderItem = (item) => {
         return (
-            <TouchableOpacity
-                style={styles.agendaItemContainer}>
+            <TouchableOpacity style={styles.agendaItemContainer}>
                 <Card>
                     <Card.Content>
                         <View style={styles.agendaItemContentContainer}>

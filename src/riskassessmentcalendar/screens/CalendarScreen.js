@@ -1,10 +1,12 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Agenda } from 'react-native-calendars';
-import { Avatar, Card } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import AuthContext from '../../auth/contexts/AuthContext';
+import Error from '../../common/components/Error';
+import Loading from '../../common/components/Loading';
+import { useAPI } from '../../common/hooks/API';
 import { useHeader } from '../hooks/CalendarHeader';
-import { BASE_URL } from '../../config/APIConfig';
 import { navigationRoutes } from '../../config/NavConfig';
 import { useCalendarHooks } from '../hooks/CalendarHooks.js';
 
@@ -40,6 +42,7 @@ const CalendarScreen = ({ navigation }) => {
         setAgendaItems,
         formatRiskAssessmentSchedules,
     } = useCalendarHooks();
+    const { loading, setLoading, error, setError } = useAPI();
 
     const today = new Date().toISOString().slice(0, 10);
 
@@ -79,19 +82,36 @@ const CalendarScreen = ({ navigation }) => {
     }, [riskAssessmentScheduleList]);
 
     async function loadSiteMaintenanceAssociate() {
-        const siteMaintenanceAssociate = await getSiteMaintenanceAssociateById(
+        setLoading(true);
+        const siteMaintenanceAssociateResponse = await getSiteMaintenanceAssociateById(
             user.id
         );
-        setAssignedRiskAssessmentScheduleIds(
-            siteMaintenanceAssociate.assignedRiskAssessmentScheduleIds
-        );
+        setLoading(false);
+        if (!siteMaintenanceAssociateResponse.data) {
+            setError(siteMaintenanceAssociateResponse.error.message);
+            console.error(siteMaintenanceAssociateResponse.error);
+        } else {
+            setAssignedRiskAssessmentScheduleIds(
+                siteMaintenanceAssociateResponse.data
+                    .assignedRiskAssessmentScheduleIds
+            );
+        }
     }
 
     async function loadAssignedRiskAssessmentSchedules(ids) {
-        const assignedRiskAssessmentScheduleData = await getAssignedRiskAssessmentSchedules(
+        setLoading(true);
+        const assignedRiskAssessmentScheduleResponse = await getAssignedRiskAssessmentSchedules(
             ids
         );
-        setRiskAssessmentScheduleList(assignedRiskAssessmentScheduleData);
+        setLoading(false);
+        if (!assignedRiskAssessmentScheduleResponse.data) {
+            setError(assignedRiskAssessmentScheduleResponse.error.message);
+            console.error(assignedRiskAssessmentScheduleResponse.error);
+        } else {
+            setRiskAssessmentScheduleList(
+                assignedRiskAssessmentScheduleResponse.data
+            );
+        }
     }
 
     function handleAgendaItemPress(event) {
@@ -121,11 +141,13 @@ const CalendarScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <Error errorMessage={error} />
             <Agenda
                 items={agendaItems}
                 selected={today}
                 renderItem={renderItem}
             />
+            <Loading loading={loading} />
         </View>
     );
 };

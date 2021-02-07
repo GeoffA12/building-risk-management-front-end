@@ -4,7 +4,7 @@ import { useAPI } from '../../common/hooks/API';
 import { convertUTCDateToLocalDate } from '../../utils/Time.js';
 
 export const useCalendarHooks = () => {
-    const { loadData } = useAPI();
+    const { loadData, responseObject } = useAPI();
     const [
         riskAssessmentScheduleList,
         setRiskAssessmentScheduleList,
@@ -18,26 +18,40 @@ export const useCalendarHooks = () => {
     const [agendaItems, setAgendaItems] = useState([]);
 
     async function getSiteMaintenanceAssociateById(userId) {
-        const siteMaintenanceAssociate = await loadData(
-            `${BASE_URL}/getSiteMaintenanceAssociateById?id=${userId}`,
-            'GET'
-        );
-        return siteMaintenanceAssociate;
+        let siteMaintenanceAssociate;
+        const siteMaintenanceAssociateResponseObject = { ...responseObject };
+        try {
+            siteMaintenanceAssociate = await loadData(
+                `${BASE_URL}/getSiteMaintenanceAssociateById?id=${userId}`,
+                'GET'
+            );
+            siteMaintenanceAssociateResponseObject.data = siteMaintenanceAssociate;
+        } catch (e) {
+            siteMaintenanceAssociateResponseObject.error = e;
+        }
+        return siteMaintenanceAssociateResponseObject;
     }
 
     async function getAssignedRiskAssessmentSchedules(
         riskAssessmentScheduleIdsList
     ) {
+        let riskAssessmentSchedules = [];
+        let riskAssessmentSchedulesResponse = { ...responseObject };
         if (riskAssessmentScheduleIdsList.length > 0) {
-            const riskAssessmentSchedules = await loadData(
-                `${BASE_URL}/getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList`,
-                'POST',
-                {
-                    riskAssessmentScheduleIds: riskAssessmentScheduleIdsList,
-                }
-            );
-            return riskAssessmentSchedules;
+            try {
+                riskAssessmentSchedules = await loadData(
+                    `${BASE_URL}/getRiskAssessmentSchedulesByRiskAssessmentSchedulesIdsList`,
+                    'POST',
+                    {
+                        riskAssessmentScheduleIds: riskAssessmentScheduleIdsList,
+                    }
+                );
+                riskAssessmentSchedulesResponse.data = riskAssessmentSchedules;
+            } catch (e) {
+                riskAssessmentSchedulesResponse.error = e;
+            }
         }
+        return riskAssessmentSchedulesResponse;
     }
 
     function formatRiskAssessmentSchedules(riskAssessmentSchedules) {
