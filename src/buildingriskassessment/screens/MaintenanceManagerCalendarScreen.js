@@ -3,7 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import { Card } from 'react-native-paper';
 import AuthContext from '../../auth/contexts/AuthContext';
+import Error from '../../common/components/Error';
+import Loading from '../../common/components/Loading';
+import { useAPI } from '../../common/hooks/API'
 import { useCalendarHooks } from '../hooks/CalendarHooks.js';
+import { useHeader } from '../hooks/CalendarHeader';
 
 const styles = StyleSheet.create({
     container: {
@@ -22,7 +26,7 @@ const styles = StyleSheet.create({
 
 const MaintenanceManagerCalendarScreen = ({ navigation }) => {
     const { user } = useContext(AuthContext);
-
+    const { setCalendarHeader } = useHeader();
     const {
         getAssociatesRiskAssessmentSchedules,
         riskAssessmentScheduleList,
@@ -31,11 +35,16 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
         agendaItems,
         setAgendaItems,
     } = useCalendarHooks();
+    const { loading, setLoading, error, setError } = useAPI();
 
     const today = new Date().toISOString().slice(0, 10);
+    useEffect(() => {
+        setCalendarHeader(navigation, loadAssociatesRiskAssessmentSchedules);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [navigation]);
 
     useEffect(() => {
-        loadAssociatesRiskAssessmentSchedules(user.id);
+        loadAssociatesRiskAssessmentSchedules();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -52,11 +61,18 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [riskAssessmentScheduleList]);
 
-    async function loadAssociatesRiskAssessmentSchedules(id) {
-        const riskAssessmentScheduleData = await getAssociatesRiskAssessmentSchedules(
-            id
+    async function loadAssociatesRiskAssessmentSchedules() {
+        setLoading(true);
+        const riskAssessmentScheduleResponse = await getAssociatesRiskAssessmentSchedules(
+            user.id
         );
-        setRiskAssessmentScheduleList(riskAssessmentScheduleData);
+        setLoading(false);
+        if (!riskAssessmentScheduleResponse.data) {
+            setError(riskAssessmentScheduleResponse.error.message);
+            console.error(riskAssessmentScheduleResponse.error);
+        } else {
+            setRiskAssessmentScheduleList(riskAssessmentScheduleResponse.data);
+        }
     }
 
     const renderItem = (item) => {
@@ -75,11 +91,13 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <Error errorMessage={error} />
             <Agenda
                 items={agendaItems}
                 selected={today}
                 renderItem={renderItem}
             />
+            <Loading loading={loading} />
         </View>
     );
 };

@@ -4,7 +4,7 @@ import { useAPI } from '../../common/hooks/API';
 import { convertUTCDateToLocalDate } from '../../utils/Time.js';
 
 export const useCalendarHooks = () => {
-    const { loadData } = useAPI();
+    const { loadData, responseObject } = useAPI();
     const [
         riskAssessmentScheduleList,
         setRiskAssessmentScheduleList,
@@ -13,11 +13,18 @@ export const useCalendarHooks = () => {
     const [agendaItems, setAgendaItems] = useState([]);
 
     async function getAssociatesRiskAssessmentSchedules(id) {
-        const riskAssessmentSchedules = await loadData(
-            `${BASE_URL}/getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager?id=${id}&activeSchedules=true`,
-            'GET'
-        );
-        return riskAssessmentSchedules;
+        let riskAssessmentSchedules;
+        const riskAssessmentSchedulesResponseObject = { ...responseObject };
+        try {
+            riskAssessmentSchedules = await loadData(
+                `${BASE_URL}/getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager?id=${id}&activeSchedules=true`,
+                'GET'
+            );
+            riskAssessmentSchedulesResponseObject.data = riskAssessmentSchedules;
+        } catch (e) {
+            riskAssessmentSchedulesResponseObject.error = e;
+        }
+        return riskAssessmentSchedulesResponseObject;
     }
 
     function formatRiskAssessmentSchedules(riskAssessmentSchedules) {
