@@ -10,7 +10,7 @@ export const useCalendarHooks = () => {
         setRiskAssessmentScheduleList,
     ] = useState([]);
 
-    const [agendaItems, setAgendaItems] = useState([]);
+    const [agendaItems, setAgendaItems] = useState({});
 
     async function getAssociatesRiskAssessmentSchedules(id) {
         let riskAssessmentSchedules;

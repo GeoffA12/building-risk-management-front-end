@@ -15,7 +15,7 @@ export const useCalendarHooks = () => {
         setAssignedRiskAssessmentScheduleIds,
     ] = useState([]);
 
-    const [agendaItems, setAgendaItems] = useState([]);
+    const [agendaItems, setAgendaItems] = useState({});
 
     async function getSiteMaintenanceAssociateById(userId) {
         let siteMaintenanceAssociate;

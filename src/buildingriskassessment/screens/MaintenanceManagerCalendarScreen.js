@@ -5,9 +5,10 @@ import { Card } from 'react-native-paper';
 import AuthContext from '../../auth/contexts/AuthContext';
 import Error from '../../common/components/Error';
 import Loading from '../../common/components/Loading';
-import { useAPI } from '../../common/hooks/API'
+import { useAPI } from '../../common/hooks/API';
 import { useCalendarHooks } from '../hooks/CalendarHooks.js';
 import { useHeader } from '../hooks/CalendarHeader';
+import { DARK_BLUE, LIGHT_TEAL } from '../../common/styles/Colors';
 
 const styles = StyleSheet.create({
     container: {
@@ -96,6 +97,13 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
                 items={agendaItems}
                 selected={today}
                 renderItem={renderItem}
+                minDate={'2017-05-16'}
+                maxDate={'2024-05-16'}
+                theme={{
+                    agendaDayTextColor: `${DARK_BLUE}`,
+                    agendaDayNumColor: `${DARK_BLUE}`,
+                    agendaKnobColor: `${LIGHT_TEAL}`,
+                }}
             />
             <Loading loading={loading} />
         </View>

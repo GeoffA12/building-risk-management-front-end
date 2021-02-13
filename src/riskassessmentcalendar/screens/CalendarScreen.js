@@ -9,6 +9,7 @@ import { useAPI } from '../../common/hooks/API';
 import { useHeader } from '../hooks/CalendarHeader';
 import { navigationRoutes } from '../../config/NavConfig';
 import { useCalendarHooks } from '../hooks/CalendarHooks.js';
+import { DARK_BLUE, LIGHT_TEAL } from '../../common/styles/Colors';
 
 const styles = StyleSheet.create({
     container: {
@@ -145,7 +146,14 @@ const CalendarScreen = ({ navigation }) => {
             <Agenda
                 items={agendaItems}
                 selected={today}
+                minDate={'2017-05-16'}
+                maxDate={'2024-05-16'}
                 renderItem={renderItem}
+                theme={{
+                    agendaDayTextColor: `${DARK_BLUE}`,
+                    agendaDayNumColor: `${DARK_BLUE}`,
+                    agendaKnobColor: `${LIGHT_TEAL}`,
+                }}
             />
             <Loading loading={loading} />
         </View>
