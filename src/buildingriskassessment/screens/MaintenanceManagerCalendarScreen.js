@@ -6,7 +6,8 @@ import AuthContext from '../../auth/contexts/AuthContext';
 import Error from '../../common/components/Error';
 import Loading from '../../common/components/Loading';
 import { useAPI } from '../../common/hooks/API';
-import { useCalendarHooks } from '../hooks/CalendarHooks.js';
+import { useManagerCalendarHooks } from '../hooks/ManagerCalendarHooks';
+import { useCalendarHooks } from '../../riskassessmentcalendar/hooks/CalendarHooks'
 import { useHeader } from '../hooks/CalendarHeader';
 import { DARK_BLUE, LIGHT_TEAL } from '../../common/styles/Colors';
 
@@ -32,10 +33,10 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
         getAssociatesRiskAssessmentSchedules,
         riskAssessmentScheduleList,
         setRiskAssessmentScheduleList,
-        formatRiskAssessmentSchedules,
         agendaItems,
         setAgendaItems,
-    } = useCalendarHooks();
+    } = useManagerCalendarHooks();
+    const { formatRiskAssessmentSchedules } = useCalendarHooks()
     const { loading, setLoading, error, setError } = useAPI();
 
     const today = new Date().toISOString().slice(0, 10);
