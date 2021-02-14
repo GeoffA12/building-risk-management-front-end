@@ -15,4 +15,5 @@ export const navigationRoutes = {
     USERPROFILE: 'User Profile',
     SMARISKASSESSMENTSCHEDULEEDITORSCREEN:
         'SMARiskAssessmentScheduleEditorScreen',
+    MAINTENANCEMANAGERCALENDARSCREEN: 'Maintenance Manager Calendar',
 };

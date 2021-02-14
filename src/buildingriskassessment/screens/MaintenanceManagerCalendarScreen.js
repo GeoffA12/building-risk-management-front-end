@@ -6,9 +6,9 @@ import AuthContext from '../../auth/contexts/AuthContext';
 import Error from '../../common/components/Error';
 import Loading from '../../common/components/Loading';
 import { useAPI } from '../../common/hooks/API';
+import { useManagerCalendarHooks } from '../hooks/ManagerCalendarHooks';
+import { useCalendarHooks } from '../../riskassessmentcalendar/hooks/CalendarHooks'
 import { useHeader } from '../hooks/CalendarHeader';
-import { navigationRoutes } from '../../config/NavConfig';
-import { useCalendarHooks } from '../hooks/CalendarHooks.js';
 import { DARK_BLUE, LIGHT_TEAL } from '../../common/styles/Colors';
 
 const styles = StyleSheet.create({
@@ -26,48 +26,29 @@ const styles = StyleSheet.create({
     },
 });
 
-const CalendarScreen = ({ navigation }) => {
-    const {
-        auth: { logout },
-        user,
-    } = useContext(AuthContext);
+const MaintenanceManagerCalendarScreen = ({ navigation }) => {
+    const { user } = useContext(AuthContext);
     const { setCalendarHeader } = useHeader();
     const {
+        getAssociatesRiskAssessmentSchedules,
         riskAssessmentScheduleList,
         setRiskAssessmentScheduleList,
-        assignedRiskAssessmentScheduleIds,
-        setAssignedRiskAssessmentScheduleIds,
-        getAssignedRiskAssessmentSchedules,
-        getSiteMaintenanceAssociateById,
         agendaItems,
         setAgendaItems,
-        formatRiskAssessmentSchedules,
-    } = useCalendarHooks();
+    } = useManagerCalendarHooks();
+    const { formatRiskAssessmentSchedules } = useCalendarHooks()
     const { loading, setLoading, error, setError } = useAPI();
 
     const today = new Date().toISOString().slice(0, 10);
-
     useEffect(() => {
-        setCalendarHeader(navigation, logout, loadSiteMaintenanceAssociate);
+        setCalendarHeader(navigation, loadAssociatesRiskAssessmentSchedules);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [navigation, logout, assignedRiskAssessmentScheduleIds]);
+    }, [navigation]);
 
     useEffect(() => {
-        loadSiteMaintenanceAssociate();
+        loadAssociatesRiskAssessmentSchedules();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (
-            assignedRiskAssessmentScheduleIds &&
-            assignedRiskAssessmentScheduleIds.length > 0
-        ) {
-            loadAssignedRiskAssessmentSchedules(
-                assignedRiskAssessmentScheduleIds
-            );
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [assignedRiskAssessmentScheduleIds]);
 
     useEffect(() => {
         if (
@@ -82,53 +63,23 @@ const CalendarScreen = ({ navigation }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [riskAssessmentScheduleList]);
 
-    async function loadSiteMaintenanceAssociate() {
+    async function loadAssociatesRiskAssessmentSchedules() {
         setLoading(true);
-        const siteMaintenanceAssociateResponse = await getSiteMaintenanceAssociateById(
+        const riskAssessmentScheduleResponse = await getAssociatesRiskAssessmentSchedules(
             user.id
         );
         setLoading(false);
-        if (!siteMaintenanceAssociateResponse.data) {
-            setError(siteMaintenanceAssociateResponse.error.message);
-            console.error(siteMaintenanceAssociateResponse.error);
+        if (!riskAssessmentScheduleResponse.data) {
+            setError(riskAssessmentScheduleResponse.error.message);
+            console.error(riskAssessmentScheduleResponse.error);
         } else {
-            setAssignedRiskAssessmentScheduleIds(
-                siteMaintenanceAssociateResponse.data
-                    .assignedRiskAssessmentScheduleIds
-            );
+            setRiskAssessmentScheduleList(riskAssessmentScheduleResponse.data);
         }
-    }
-
-    async function loadAssignedRiskAssessmentSchedules(ids) {
-        setLoading(true);
-        const assignedRiskAssessmentScheduleResponse = await getAssignedRiskAssessmentSchedules(
-            ids
-        );
-        setLoading(false);
-        if (!assignedRiskAssessmentScheduleResponse.data) {
-            setError(assignedRiskAssessmentScheduleResponse.error.message);
-            console.error(assignedRiskAssessmentScheduleResponse.error);
-        } else {
-            setRiskAssessmentScheduleList(
-                assignedRiskAssessmentScheduleResponse.data
-            );
-        }
-    }
-
-    function handleAgendaItemPress(event) {
-        navigation.navigate(
-            navigationRoutes.SMARISKASSESSMENTSCHEDULEEDITORSCREEN,
-            {
-                riskAssessmentScheduleId: event.id,
-            }
-        );
     }
 
     const renderItem = (item) => {
         return (
-            <TouchableOpacity
-                style={styles.agendaItemContainer}
-                onPress={() => handleAgendaItemPress(item)}>
+            <TouchableOpacity style={styles.agendaItemContainer}>
                 <Card>
                     <Card.Content>
                         <View style={styles.agendaItemContentContainer}>
@@ -146,9 +97,9 @@ const CalendarScreen = ({ navigation }) => {
             <Agenda
                 items={agendaItems}
                 selected={today}
+                renderItem={renderItem}
                 minDate={'2017-05-16'}
                 maxDate={'2024-05-16'}
-                renderItem={renderItem}
                 theme={{
                     agendaDayTextColor: `${DARK_BLUE}`,
                     agendaDayNumColor: `${DARK_BLUE}`,
@@ -160,4 +111,4 @@ const CalendarScreen = ({ navigation }) => {
     );
 };
 
-export default CalendarScreen;
+export default MaintenanceManagerCalendarScreen;
