@@ -7,7 +7,7 @@ import Error from '../../common/components/Error';
 import Loading from '../../common/components/Loading';
 import { useAPI } from '../../common/hooks/API';
 import { useManagerCalendarHooks } from '../hooks/ManagerCalendarHooks';
-import { useCalendarHooks } from '../../riskassessmentcalendar/hooks/CalendarHooks'
+import { useCalendarHooks } from '../../riskassessmentcalendar/hooks/CalendarHooks';
 import { useHeader } from '../hooks/CalendarHeader';
 import { DARK_BLUE, LIGHT_TEAL } from '../../common/styles/Colors';
 
@@ -36,7 +36,7 @@ const MaintenanceManagerCalendarScreen = ({ navigation }) => {
         agendaItems,
         setAgendaItems,
     } = useManagerCalendarHooks();
-    const { formatRiskAssessmentSchedules } = useCalendarHooks()
+    const { formatRiskAssessmentSchedules } = useCalendarHooks();
     const { loading, setLoading, error, setError } = useAPI();
 
     const today = new Date().toISOString().slice(0, 10);

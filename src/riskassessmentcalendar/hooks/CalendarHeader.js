@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import HeaderButton from '../../common/components/HeaderButton';
-import { useCalendarHooks } from './CalendarHooks';
 
 const styles = StyleSheet.create({
     headerContainer: {

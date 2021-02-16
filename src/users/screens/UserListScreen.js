@@ -90,7 +90,6 @@ const UserListScreen = ({ navigation }) => {
     }
 
     async function handleSiteRoleChange(siteRole) {
-        console.log(siteRole);
         if (SiteRoles.hasOwnProperty(siteRole)) {
             const filteredUsersBySiteRole = users.filter(
                 (existingUser) =>
@@ -117,12 +116,6 @@ const UserListScreen = ({ navigation }) => {
 
     function renderUser({ item: existingUser }) {
         return <User user={existingUser} onPress={handleUserCardPress} />;
-    }
-
-    function handleCancelPress() {
-        console.log('Cancel button pressed!');
-        setSearchText('First name..');
-        loadUsers();
     }
 
     function setPickerCallback() {

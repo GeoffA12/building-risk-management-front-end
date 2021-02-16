@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { DARK_BLUE, DARK_PURPLE } from '../styles/Colors';
+import { DARK_BLUE } from '../styles/Colors';
 
 const styles = StyleSheet.create({
     card: {

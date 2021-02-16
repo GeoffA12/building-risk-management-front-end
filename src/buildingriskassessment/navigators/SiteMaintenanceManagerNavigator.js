@@ -1,11 +1,7 @@
-import React, { useContext } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import AuthContext from '../../auth/contexts/AuthContext';
 import { navigationRoutes } from '../../config/NavConfig';
-import HeaderButton from '../../common/components/HeaderButton';
 import BuildingRiskAssessmentListScreen from '../screens/BuildingRiskAssessmentListScreen';
 import RiskAssessmentListScreen from '../../riskassessment/screens/RiskAssessmentListScreen';
 import BuildingRiskAssessmentEditorScreen from '../screens/BuildingRiskAssessmentEditorScreen';
@@ -13,102 +9,18 @@ import RiskAssessmentEditorScreen from '../../riskassessment/screens/RiskAssessm
 import RiskAssessmentScheduleEditorScreen from '../screens/RiskAssessmentScheduleEditorScreen';
 import UserProfileScreen from '../../users/screens/UserProfileScreen';
 import MaintenanceManagerCalendarScreen from '../screens/MaintenanceManagerCalendarScreen';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 const SiteMaintenanceManagerDrawer = createDrawerNavigator();
 
 const SiteMaintenanceManagerStack = createStackNavigator();
-const RiskAssessmentStack = createStackNavigator();
-const SiteMaintenanceManagerTopTabs = createMaterialTopTabNavigator();
-
-const styles = StyleSheet.create({
-    headerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-    },
-});
 
 const SiteMaintenanceManagerNavigator = () => {
-    const {
-        auth: { logout },
-    } = useContext(AuthContext);
-    function getHeaderTitle(route) {
-        const routeName =
-            getFocusedRouteNameFromRoute(route) ??
-            navigationRoutes.BUILDINGRISKASSESSMENTLIST;
-
-        switch (routeName) {
-            case navigationRoutes.BUILDINGRISKASSESSMENTLIST:
-                return 'Building Assessment List';
-            case navigationRoutes.RISKASSESSMENTLIST:
-                return 'Risk Assessment List';
-            default:
-                return 'Unknown';
-        }
-    }
-
-    function getHeaderRight(navigation, route) {
-        const routeName =
-            getFocusedRouteNameFromRoute(route) ??
-            navigationRoutes.BUILDINGRISKASSESSMENTLIST;
-
-        switch (routeName) {
-            case navigationRoutes.BUILDINGRISKASSESSMENTLIST:
-                return (
-                    <View style={styles.headerContainer}>
-                        <HeaderButton
-                            name={'add'}
-                            onPress={() =>
-                                navigation.navigate(
-                                    navigationRoutes.BUILDINGRISKASSESSMENTEDITOR
-                                )
-                            }
-                        />
-                        <HeaderButton name={'exit'} onPress={() => logout()} />
-                    </View>
-                );
-            case navigationRoutes.RISKASSESSMENTLIST:
-                return (
-                    <View style={styles.headerContainer}>
-                        <HeaderButton name={'exit'} onPress={() => logout()} />
-                    </View>
-                );
-            default:
-                return null;
-        }
-    }
-
-    function createTopTabs() {
-        return (
-            <SiteMaintenanceManagerTopTabs.Navigator>
-                <SiteMaintenanceManagerTopTabs.Screen
-                    name={navigationRoutes.BUILDINGRISKASSESSMENTLIST}
-                    component={BuildingRiskAssessmentListScreen}
-                    options={{
-                        title: 'Building assessments',
-                    }}
-                />
-                <SiteMaintenanceManagerTopTabs.Screen
-                    name={navigationRoutes.RISKASSESSMENTLIST}
-                    component={RiskAssessmentListScreen}
-                />
-            </SiteMaintenanceManagerTopTabs.Navigator>
-        );
-    }
-
     function createBuildingRiskAssessmentStack() {
         return (
             <SiteMaintenanceManagerStack.Navigator mode={'modal'}>
                 <SiteMaintenanceManagerStack.Screen
                     name={navigationRoutes.BUILDINGRISKASSESSMENTLIST}
-                    // children={createTopTabs}
                     component={BuildingRiskAssessmentListScreen}
-                    // options={({ navigation, route }) => ({
-                    //     headerTitle: getHeaderTitle(route),
-                    //     headerTitleAlign: 'center',
-                    //     headerRight: () => getHeaderRight(navigation, route),
-                    // })}
                     options={{
                         title: 'Building Assessment List',
                         headerTitleAlign: 'center',

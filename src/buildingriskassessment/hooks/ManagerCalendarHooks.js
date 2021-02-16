@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { BASE_URL } from '../../config/APIConfig';
 import { useAPI } from '../../common/hooks/API';
-import { convertUTCDateToLocalDate } from '../../utils/Time.js';
 
 export const useManagerCalendarHooks = () => {
     const { loadData, responseObject } = useAPI();

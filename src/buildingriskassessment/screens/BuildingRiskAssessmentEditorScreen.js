@@ -131,7 +131,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     const {
         buildingRiskAssessmentModel,
         setBuildingRiskAssessmentModel,
-        getBuildings,
         saveBuildingRiskAssessment,
         getBuildingRiskAssessment,
         deleteBuildingRiskAssessment,
@@ -329,7 +328,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             console.error(riskAssessmentSchedulesResponse.error);
             setError(riskAssessmentSchedulesResponse.error.message);
         } else {
-            console.log(riskAssessmentSchedulesResponse.data);
             setRiskAssessmentSchedules(riskAssessmentSchedulesResponse.data);
         }
     }

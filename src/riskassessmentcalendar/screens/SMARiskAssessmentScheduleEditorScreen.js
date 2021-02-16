@@ -253,8 +253,6 @@ const SMARiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         });
     }
 
-    console.log(riskAssessmentSchedulePlayground);
-
     async function handleSaveRiskAssessmentSchedulePress() {
         setLoading(true);
         const riskAssessmentScheduleResponse = await submitRiskAssessmentSchedule(

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import axios from 'axios';
+import Error from '../../common/components/Error';
 import { convertUTCDateToLocalDate } from '../../utils/Time';
 import { DARK_BLUE, LIGHT_TEAL } from '../../common/styles/Colors';
 import { BASE_URL } from '../../config/APIConfig';
@@ -36,7 +37,6 @@ const styles = StyleSheet.create({
 const EntityStatus = ({ entityName, publisherId, updatedAt }) => {
     const [publisher, setPublisher] = useState(null);
     const [date, setDate] = useState('');
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -47,25 +47,22 @@ const EntityStatus = ({ entityName, publisherId, updatedAt }) => {
     async function getPublisher() {
         let publisherResponse;
         try {
-            setLoading(true);
             publisherResponse = await axios.get(
                 `${BASE_URL}/getUserById?id=${publisherId}`
             );
         } catch (e) {
             console.error(e.message);
             setError(e.message);
-            setLoading(false);
         }
         setError('');
-        setLoading(false);
         const publisherData = publisherResponse.data;
         setPublisher(publisherData);
-        // let formattedDate = new Date(updatedAt);
         setDate(convertUTCDateToLocalDate(updatedAt));
     }
 
     return (
         <View style={styles.container}>
+            <Error errorMessage={error} />
             <View style={styles.entityStatusContainer}>
                 <Text style={styles.titleText}>{entityName} status:</Text>
                 {publisher ? (

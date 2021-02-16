@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, TextInput } from 'react-native';
 import { LIGHT_TEAL } from '../styles/Colors';
 
@@ -12,21 +12,7 @@ const styles = StyleSheet.create({
 });
 
 const FormInput = ({ style, ...props }) => {
-    // const defaultLineHeight = 42;
-    // const [formLineHeight, setFormLineHeight] = useState(defaultLineHeight);
-
-    // function handleFormLineHeightChange(event) {
-    //     console.log(event.nativeEvent);
-    //     setFormLineHeight(event.nativeEvent.contentSize.height);
-    // }
-
-    return (
-        <TextInput
-            {...props}
-            style={[styles.input, style]}
-            // onChange={(e) => handleFormLineHeightChange(e)}
-        />
-    );
+    return <TextInput {...props} style={[styles.input, style]} />;
 };
 
 export default FormInput;

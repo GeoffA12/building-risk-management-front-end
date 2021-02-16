@@ -75,7 +75,6 @@ export const useAuth = () => {
                 siteId,
                 siteMaintenanceManagerId
             ) => {
-                console.log(SiteRoles[siteRole].urlValue);
                 const url = `${BASE_URL}/create${SiteRoles[siteRole].urlValue}`;
                 const userFormInput = {
                     siteRole,

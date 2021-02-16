@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-ionicons';
 import PropTypes from 'prop-types';
-import { LIGHT_TEAL, DARK_BLUE, LIGHT_GRAY } from '../../common/styles/Colors';
+import { LIGHT_TEAL, DARK_BLUE } from '../../common/styles/Colors';
 import { convertUTCDateToLocalDate } from '../../utils/Time';
 
 const styles = StyleSheet.create({
