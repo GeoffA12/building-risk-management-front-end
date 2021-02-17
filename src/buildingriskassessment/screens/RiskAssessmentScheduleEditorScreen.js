@@ -140,7 +140,9 @@ const styles = StyleSheet.create({
 const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     const { user } = useContext(AuthContext);
     const { error, setError, loading, setLoading } = useAPI();
-    const { getSiteMaintenanceAssociates } = useBuildingRiskAssessment();
+    const {
+        getSiteMaintenanceAssociatesOfManager,
+    } = useBuildingRiskAssessment();
 
     const {
         riskAssessmentScheduleModel,
@@ -287,8 +289,8 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
 
     async function loadSiteMaintenanceAssociates() {
         setLoading(true);
-        const siteMaintenanceAssociatesResponse = await getSiteMaintenanceAssociates(
-            user.associatedSiteIds
+        const siteMaintenanceAssociatesResponse = await getSiteMaintenanceAssociatesOfManager(
+            user.id
         );
         setLoading(false);
         if (siteMaintenanceAssociatesResponse.data) {

@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     FlatList,
     LogBox,
+    Alert,
 } from 'react-native';
 import Icon from 'react-native-ionicons';
 import cloneDeep from 'lodash/cloneDeep';
@@ -162,6 +163,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     );
 
     const [riskAssessmentSchedules, setRiskAssessmentSchedules] = useState([]);
+    const [invalidLeaveState, setInvalidLeaveState] = useState(true);
     const [
         transformedRiskAssessmentSchedules,
         setTransformedRiskAssessmentSchedules,
@@ -210,9 +212,11 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     }, [route]);
 
     useEffect(() => {
-        setBuildingRiskAssessmentPlayground(
-            cloneDeep(buildingRiskAssessmentModel)
-        );
+        if (buildingRiskAssessmentModel.id) {
+            setBuildingRiskAssessmentPlayground(
+                cloneDeep(buildingRiskAssessmentModel)
+            );
+        }
         setSelectedBuilding(buildingRiskAssessmentModel.buildingId);
         if (
             buildingRiskAssessmentModel.publisherId &&
@@ -241,8 +245,41 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
         } else {
             setIsDirty(true);
         }
+        setInvalidLeaveState(
+            !buildingRiskAssessmentPlayground.id &&
+                riskAssessmentSchedules.length > 0 &&
+                !route.params.buildingRiskAssessmentId
+        );
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [riskAssessmentPlayground, riskAssessmentSchedules]);
+    }, [
+        buildingRiskAssessmentPlayground,
+        riskAssessmentPlayground,
+        riskAssessmentSchedules,
+    ]);
+
+    useEffect(() => {
+        console.log(invalidLeaveState);
+        if (invalidLeaveState) {
+            navigation.addListener('beforeRemove', handleBackPress);
+        } else {
+            navigation.removeListener('beforeRemove', handleBackPress);
+        }
+    }, [invalidLeaveState, navigation]);
+
+    function handleBackPress(e) {
+        console.log(e);
+        e.preventDefault();
+        Alert.alert(
+            'Save Building Assessment Changes Before Leaving!',
+            'You must save your building assessment before going back to the list screen.',
+            [
+                {
+                    text: 'OK',
+                    style: 'default',
+                },
+            ]
+        );
+    }
 
     useEffect(() => {
         setBuildingPickerOptions();
@@ -471,6 +508,9 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
                     'Building risk assessment saved!',
                     'Your building risk assessment has been successfully saved. Go back to list screen and refresh to view it in the list.'
                 );
+                navigation.removeListener('beforeRemove', (e) =>
+                    handleBackPress(e)
+                );
                 navigation.navigate(
                     navigationRoutes.BUILDINGRISKASSESSMENTEDITOR,
                     {
@@ -502,6 +542,7 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             navigation.navigate(navigationRoutes.BUILDINGRISKASSESSMENTLIST, {
                 refresh: true,
             });
+            setRiskAssessmentSchedules([]);
         }
     }
 
@@ -606,6 +647,10 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             setError(deletedRiskAssessmentScheduleResponse.error.message);
         } else {
             console.log(deletedRiskAssessmentScheduleResponse.data);
+            showNotification(
+                'Risk assessment schedule deleted!',
+                'Risk assessment schedule was successfully deleted.'
+            );
             setRiskAssessmentSchedules((prevSchedules) => {
                 let updatedSchedules = [...prevSchedules];
                 updatedSchedules.splice(index, 1);

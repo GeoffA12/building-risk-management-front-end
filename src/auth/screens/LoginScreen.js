@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Alert } from 'react-native';
 import Heading from '../../common/components/Heading';
 import FormInput from '../../common/components/FormInput';
 import StyledButton from '../../common/components/StyledButton';
@@ -77,14 +77,29 @@ const LoginScreen = ({ navigation, route }) => {
     }, [route]);
 
     async function handleLoginPress() {
-        try {
-            setLoading(true);
-            await login(username, password);
-        } catch (e) {
-            console.error(e);
-            setError(e.message);
-            setLoading(false);
-            return;
+        let userResponse;
+        setLoading(true);
+        userResponse = await login(username, password);
+        setLoading(false);
+        if (!userResponse.data) {
+            if (
+                userResponse.error &&
+                Object.keys(userResponse.error).length > 0
+            ) {
+                console.error(userResponse.error);
+                setError(userResponse.error.message);
+            } else {
+                Alert.alert(
+                    'Invalid Login',
+                    'Invalid username or password was entered.',
+                    [
+                        {
+                            text: 'OK',
+                            style: 'default',
+                        },
+                    ]
+                );
+            }
         }
     }
 
