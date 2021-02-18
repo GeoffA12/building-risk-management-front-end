@@ -54,22 +54,22 @@ export const useAuth = () => {
                         message: 'Invalid Username or Password',
                     };
                 }
-                let data = userResponseObject.data;
-                if (data) {
-                    const user = {
-                        id: data.id,
-                        firstName: data.firstName,
-                        lastName: data.lastName,
-                        username: data.username,
-                        phone: data.phone,
-                        email: data.email,
-                        authToken: data.authToken,
-                        associatedSiteIds: data.associatedSiteIds,
-                        siteRole: data.siteRole,
-                    };
-                    await SecureStorage.setItem(userKey, JSON.stringify(user));
-                    dispatch(createAction('SET_USER', user));
-                }
+                // let data = userResponseObject.data;
+                // if (data) {
+                //     const user = {
+                //         id: data.id,
+                //         firstName: data.firstName,
+                //         lastName: data.lastName,
+                //         username: data.username,
+                //         phone: data.phone,
+                //         email: data.email,
+                //         authToken: data.authToken,
+                //         associatedSiteIds: data.associatedSiteIds,
+                //         siteRole: data.siteRole,
+                //     };
+                //     await SecureStorage.setItem(userKey, JSON.stringify(user));
+                //     dispatch(createAction('SET_USER', user));
+                // }
                 return userResponseObject;
             },
             logout: async () => {
@@ -128,5 +128,5 @@ export const useAuth = () => {
         });
     }, []);
 
-    return { auth, state };
+    return { auth, state, dispatch, userKey };
 };

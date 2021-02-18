@@ -258,7 +258,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     ]);
 
     useEffect(() => {
-        console.log(invalidLeaveState);
         if (invalidLeaveState) {
             navigation.addListener('beforeRemove', handleBackPress);
         } else {
@@ -267,7 +266,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
     }, [invalidLeaveState, navigation]);
 
     function handleBackPress(e) {
-        console.log(e);
         e.preventDefault();
         Alert.alert(
             'Save Building Assessment Changes Before Leaving!',
@@ -483,7 +481,6 @@ const BuildingRiskAssessmentEditorScreen = ({ navigation, route }) => {
             setError(buildingRiskAssessmentResponse.error.message);
         } else {
             setLoading(true);
-            console.log(riskAssessmentSchedules);
             const attachBuildingRiskAssessmentIdToRiskAssessmentSchedulesResponse = await attachBuildingRiskAssessmentIdToRiskAssessmentSchedules(
                 riskAssessmentSchedules,
                 user.id,

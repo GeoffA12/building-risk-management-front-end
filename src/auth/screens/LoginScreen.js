@@ -1,11 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { StyleSheet, View, Alert } from 'react-native';
+import SecureStorage from 'react-native-secure-storage';
 import Heading from '../../common/components/Heading';
 import FormInput from '../../common/components/FormInput';
 import StyledButton from '../../common/components/StyledButton';
 import Error from '../../common/components/Error';
 import AuthContainer from '../../users/components/AuthContainer';
 import { navigationRoutes } from '../../config/NavConfig';
+import { createAction } from '../../utils/CreateAction';
 import AuthContext from '../contexts/AuthContext';
 import Loading from '../../common/components/Loading';
 import { DARK_BLUE } from '../../common/styles/Colors';
@@ -56,6 +58,8 @@ const styles = StyleSheet.create({
 const LoginScreen = ({ navigation, route }) => {
     const {
         auth: { login },
+        dispatch,
+        userKey,
     } = useContext(AuthContext);
 
     const { showNotification } = useNotifications();
@@ -100,6 +104,21 @@ const LoginScreen = ({ navigation, route }) => {
                     ]
                 );
             }
+        } else {
+            let data = userResponse.data;
+            const user = {
+                id: data.id,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                username: data.username,
+                phone: data.phone,
+                email: data.email,
+                authToken: data.authToken,
+                associatedSiteIds: data.associatedSiteIds,
+                siteRole: data.siteRole,
+            };
+            await SecureStorage.setItem(userKey, JSON.stringify(user));
+            dispatch(createAction('SET_USER', user));
         }
     }
 

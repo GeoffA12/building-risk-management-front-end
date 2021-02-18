@@ -17,7 +17,7 @@ import { useAuth } from './auth/hooks/Auth';
 const RootStack = createStackNavigator();
 
 const App = () => {
-    const { auth, state } = useAuth();
+    const { auth, state, dispatch, userKey } = useAuth();
 
     function pickUserScreenToRender() {
         switch (state.user.siteRole) {
@@ -76,7 +76,8 @@ const App = () => {
     }
 
     return (
-        <AuthContext.Provider value={{ auth, user: state.user }}>
+        <AuthContext.Provider
+            value={{ auth, user: state.user, dispatch, userKey }}>
             <PaperProvider>
                 <NavigationContainer>
                     <RootStack.Navigator

@@ -35,8 +35,10 @@ import {
     LIGHT_TEAL,
     BABY_BLUE,
     DARK_BABY_BLUE,
+    DISABLED_BUTTON,
 } from '../../common/styles/Colors';
 import { navigationRoutes } from '../../config/NavConfig';
+import isEqual from 'lodash.isequal';
 
 const styles = StyleSheet.create({
     screenContainer: {
@@ -71,6 +73,15 @@ const styles = StyleSheet.create({
         color: `${LIGHT_GRAY}`,
         fontSize: 17,
         fontWeight: '600',
+    },
+    disabledIconButton: {
+        backgroundColor: `${DISABLED_BUTTON}`,
+        marginHorizontal: 8,
+        marginVertical: 8,
+        borderRadius: 10,
+        flexDirection: 'row',
+        paddingHorizontal: 7,
+        paddingVertical: 5,
     },
     iconButton: {
         backgroundColor: `${DARK_BLUE}`,
@@ -159,6 +170,7 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
     const [hazardIndex, setHazardIndex] = useState(-1);
     const { hazardModel } = useHazard();
     const [hazardDetails, setHazardDetails] = useState({ ...hazardModel });
+    const [isDirty, setIsDirty] = useState(false);
 
     const [scheduleEditorOpen, setScheduleEditorOpen] = useState(false);
 
@@ -212,6 +224,20 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [riskAssessmentScheduleModel]);
+
+    useEffect(() => {
+        if (
+            isEqual(
+                riskAssessmentSchedulePlayground,
+                riskAssessmentScheduleModel
+            )
+        ) {
+            setIsDirty(false);
+        } else {
+            setIsDirty(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [riskAssessmentSchedulePlayground]);
 
     useEffect(() => {
         if (route.params.riskAssessmentId) {
@@ -423,7 +449,10 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         };
         setRiskAssessmentSchedulePlayground((prevPlayground) => {
             const updatedPlayground = { ...prevPlayground };
-            if (!updatedPlayground.hazards) {
+            if (
+                !updatedPlayground.hazards ||
+                updatedPlayground.hazards.length === 0
+            ) {
                 updatedPlayground.hazards = [newHazard];
             } else {
                 if (index === -1) {
@@ -513,6 +542,33 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
         });
     }
 
+    function validateRiskAssessmentSchedulePlayground() {
+        let isValid = false;
+        if (riskAssessmentSchedulePlayground) {
+            if (
+                riskAssessmentSchedulePlayground.dueDate &&
+                riskAssessmentSchedulePlayground.riskAssessmentId &&
+                riskAssessmentSchedulePlayground.workOrder
+            ) {
+                if (
+                    riskAssessmentSchedulePlayground.hazards &&
+                    riskAssessmentSchedulePlayground.screeners &&
+                    riskAssessmentSchedulePlayground.siteMaintenanceAssociateIds
+                ) {
+                    if (
+                        riskAssessmentSchedulePlayground.hazards.length > 0 &&
+                        riskAssessmentSchedulePlayground.screeners.length > 0 &&
+                        riskAssessmentSchedulePlayground
+                            .siteMaintenanceAssociateIds.length > 0
+                    ) {
+                        isValid = true;
+                    }
+                }
+            }
+        }
+        return isValid;
+    }
+
     function renderHazards() {
         return riskAssessmentSchedulePlayground.hazards.map((hazard, index) => (
             <Hazard
@@ -563,7 +619,6 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                     : 'Add new schedule'
                             }
                             onPress={handleAddSchedulePress}
-                            disabled={false}
                             style={styles.optionButton}
                             textStyle={styles.optionButtonText}
                         />
@@ -579,8 +634,21 @@ const RiskAssessmentScheduleEditorScreen = ({ navigation, route }) => {
                                 />
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={styles.iconButton}
-                                onPress={handleSaveSchedulePress}>
+                                style={
+                                    !(
+                                        isDirty &&
+                                        validateRiskAssessmentSchedulePlayground()
+                                    )
+                                        ? styles.disabledIconButton
+                                        : styles.iconButton
+                                }
+                                onPress={handleSaveSchedulePress}
+                                disabled={
+                                    !(
+                                        isDirty &&
+                                        validateRiskAssessmentSchedulePlayground()
+                                    )
+                                }>
                                 <Icon
                                     name={'save'}
                                     style={styles.iconStyle}
