@@ -4,8 +4,10 @@ import SecureStorage from 'react-native-secure-storage';
 import { createAction } from '../../utils/CreateAction';
 import { BASE_URL } from '../../config/APIConfig';
 import SiteRoles from '../../config/SiteRolesConfig';
+import { useAPI } from '../../common/hooks/API';
 
 export const useAuth = () => {
+    const { responseObject, loadData } = useAPI();
     const userKey = 'user';
     const [state, dispatch] = useReducer(
         (currentState, action) => {
@@ -38,27 +40,37 @@ export const useAuth = () => {
     const auth = useMemo(
         () => ({
             login: async (username, password) => {
+                let userResponse;
+                let userResponseObject = { ...responseObject };
                 const url = `${BASE_URL}/authenticateUserLogin`;
-                const response = await axios.post(url, {
-                    username,
-                    hashPassword: password,
-                });
-                const { data } = response;
-                if (data) {
-                    const user = {
-                        id: data.id,
-                        firstName: data.firstName,
-                        lastName: data.lastName,
-                        username: data.username,
-                        phone: data.phone,
-                        email: data.email,
-                        authToken: data.authToken,
-                        associatedSiteIds: data.associatedSiteIds,
-                        siteRole: data.siteRole,
+                try {
+                    userResponse = await loadData(url, 'POST', {
+                        username,
+                        hashPassword: password,
+                    });
+                    userResponseObject.data = userResponse;
+                } catch (e) {
+                    userResponseObject.error = {
+                        message: 'Invalid Username or Password',
                     };
-                    await SecureStorage.setItem(userKey, JSON.stringify(user));
-                    dispatch(createAction('SET_USER', user));
                 }
+                // let data = userResponseObject.data;
+                // if (data) {
+                //     const user = {
+                //         id: data.id,
+                //         firstName: data.firstName,
+                //         lastName: data.lastName,
+                //         username: data.username,
+                //         phone: data.phone,
+                //         email: data.email,
+                //         authToken: data.authToken,
+                //         associatedSiteIds: data.associatedSiteIds,
+                //         siteRole: data.siteRole,
+                //     };
+                //     await SecureStorage.setItem(userKey, JSON.stringify(user));
+                //     dispatch(createAction('SET_USER', user));
+                // }
+                return userResponseObject;
             },
             logout: async () => {
                 await SecureStorage.removeItem(userKey);
@@ -99,6 +111,7 @@ export const useAuth = () => {
                 }
             },
         }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         []
     );
 
@@ -115,5 +128,5 @@ export const useAuth = () => {
         });
     }, []);
 
-    return { auth, state };
+    return { auth, state, dispatch, userKey };
 };

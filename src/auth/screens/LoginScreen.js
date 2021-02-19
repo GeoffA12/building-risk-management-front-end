@@ -1,11 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Alert } from 'react-native';
+import SecureStorage from 'react-native-secure-storage';
 import Heading from '../../common/components/Heading';
 import FormInput from '../../common/components/FormInput';
 import StyledButton from '../../common/components/StyledButton';
 import Error from '../../common/components/Error';
 import AuthContainer from '../../users/components/AuthContainer';
 import { navigationRoutes } from '../../config/NavConfig';
+import { createAction } from '../../utils/CreateAction';
 import AuthContext from '../contexts/AuthContext';
 import Loading from '../../common/components/Loading';
 import { DARK_BLUE } from '../../common/styles/Colors';
@@ -56,6 +58,8 @@ const styles = StyleSheet.create({
 const LoginScreen = ({ navigation, route }) => {
     const {
         auth: { login },
+        dispatch,
+        userKey,
     } = useContext(AuthContext);
 
     const { showNotification } = useNotifications();
@@ -77,14 +81,44 @@ const LoginScreen = ({ navigation, route }) => {
     }, [route]);
 
     async function handleLoginPress() {
-        try {
-            setLoading(true);
-            await login(username, password);
-        } catch (e) {
-            console.error(e);
-            setError(e.message);
-            setLoading(false);
-            return;
+        let userResponse;
+        setLoading(true);
+        userResponse = await login(username, password);
+        setLoading(false);
+        if (!userResponse.data) {
+            if (
+                userResponse.error &&
+                Object.keys(userResponse.error).length > 0
+            ) {
+                console.error(userResponse.error);
+                setError(userResponse.error.message);
+            } else {
+                Alert.alert(
+                    'Invalid Login',
+                    'Invalid username or password was entered.',
+                    [
+                        {
+                            text: 'OK',
+                            style: 'default',
+                        },
+                    ]
+                );
+            }
+        } else {
+            let data = userResponse.data;
+            const user = {
+                id: data.id,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                username: data.username,
+                phone: data.phone,
+                email: data.email,
+                authToken: data.authToken,
+                associatedSiteIds: data.associatedSiteIds,
+                siteRole: data.siteRole,
+            };
+            await SecureStorage.setItem(userKey, JSON.stringify(user));
+            dispatch(createAction('SET_USER', user));
         }
     }
 

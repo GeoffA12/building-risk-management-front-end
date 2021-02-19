@@ -84,6 +84,23 @@ export const useBuildingRiskAssessment = () => {
         return siteMaintenanceAssociatesResponse;
     }
 
+    async function getSiteMaintenanceAssociatesOfManager(
+        siteMaintenanceManagerId
+    ) {
+        let siteMaintenanceAssociates;
+        let siteMaintenanceAssociatesResponse = { ...responseObject };
+        try {
+            siteMaintenanceAssociates = await loadData(
+                `${BASE_URL}/getSiteMaintenanceAssociatesBySiteMaintenanceManagerId?siteMaintenanceManagerId=${siteMaintenanceManagerId}`,
+                'GET'
+            );
+            siteMaintenanceAssociatesResponse.data = siteMaintenanceAssociates;
+        } catch (e) {
+            siteMaintenanceAssociatesResponse.error = e;
+        }
+        return siteMaintenanceAssociatesResponse;
+    }
+
     async function saveBuildingRiskAssessment(uri, inputObject) {
         let buildingRiskAssessmentResponse = { ...responseObject };
         let buildingRiskAssessment;
@@ -137,6 +154,7 @@ export const useBuildingRiskAssessment = () => {
         setRiskAssessmentModel,
         getBuildingRiskAssessments,
         getSiteMaintenanceAssociates,
+        getSiteMaintenanceAssociatesOfManager,
         saveBuildingRiskAssessment,
         getBuildingRiskAssessment,
         getInitialPickerState,
