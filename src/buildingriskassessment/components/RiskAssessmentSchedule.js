@@ -82,7 +82,8 @@ const RiskAssessmentSchedule = ({
                 </Text>
                 <View style={styles.scheduleRow}>
                     <Text style={styles.subtitleFont}>
-                        Due date: {convertUTCDateToLocalDate(schedule.dueDate)}
+                        Due date:{' '}
+                        {convertUTCDateToLocalDate(schedule.dueDate, false)}
                     </Text>
                     <Text style={styles.subtitleFont}>
                         Order: {schedule.workOrder}

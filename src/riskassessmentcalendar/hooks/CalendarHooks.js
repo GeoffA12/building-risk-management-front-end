@@ -63,7 +63,7 @@ export const useCalendarHooks = () => {
                     name:
                         schedule.title +
                         '\n\n' +
-                        convertUTCDateToLocalDate(schedule.dueDate) +
+                        convertUTCDateToLocalDate(schedule.dueDate, false) +
                         '\n' +
                         formatStatus(schedule.status),
                     id: schedule.id,
