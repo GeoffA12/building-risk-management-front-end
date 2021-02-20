@@ -1,9 +1,19 @@
-export const convertUTCDateToLocalDate = (dateString) => {
+export const convertUTCDateToLocalDate = (dateString, isCurrentTime) => {
     let date = new Date(dateString);
 
-    let offset = date.getTimezoneOffset() * 60000;
+    let offset = date.getTimezoneOffset();
 
-    // date.setTime(date.getTime() - offset);
+    if (!isCurrentTime) {
+        date.setHours(date.getHours() + offset / 60);
+    }
+
+    // if (date.getHours() === 17 || date.getHours() === 18) {
+    //     date.setMinutes(date.getMinutes() + offset);
+    // }
+
+    // if (date.getHours() === 11) {
+    //     date.setHours(date.getHours() + 6);
+    // }
 
     let militaryHours = date.getHours();
     let localHours = militaryHours;

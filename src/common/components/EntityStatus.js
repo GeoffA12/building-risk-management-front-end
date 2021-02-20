@@ -57,7 +57,7 @@ const EntityStatus = ({ entityName, publisherId, updatedAt }) => {
         setError('');
         const publisherData = publisherResponse.data;
         setPublisher(publisherData);
-        setDate(convertUTCDateToLocalDate(updatedAt));
+        setDate(convertUTCDateToLocalDate(updatedAt, true));
     }
 
     return (

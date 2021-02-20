@@ -51,7 +51,10 @@ const RiskAssessment = ({ riskAssessment, onPress }) => {
                 </Text>
                 <Text style={styles.subtitle}>
                     {getTimePrefix() +
-                        convertUTCDateToLocalDate(riskAssessment.updatedAt)}
+                        convertUTCDateToLocalDate(
+                            riskAssessment.updatedAt,
+                            true
+                        )}
                 </Text>
             </View>
         </FlatListCard>

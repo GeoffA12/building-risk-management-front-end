@@ -46,7 +46,7 @@ const BuildingRiskAssessment = ({ onPress, entity }) => {
                 </Text>
                 <Text style={styles.subtitle}>
                     {getTimePrefix() +
-                        convertUTCDateToLocalDate(entity.updatedAt)}
+                        convertUTCDateToLocalDate(entity.updatedAt, true)}
                 </Text>
             </View>
         </FlatListCard>
