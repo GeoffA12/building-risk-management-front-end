@@ -7,14 +7,6 @@ export const convertUTCDateToLocalDate = (dateString, isCurrentTime) => {
         date.setHours(date.getHours() + offset / 60);
     }
 
-    // if (date.getHours() === 17 || date.getHours() === 18) {
-    //     date.setMinutes(date.getMinutes() + offset);
-    // }
-
-    // if (date.getHours() === 11) {
-    //     date.setHours(date.getHours() + 6);
-    // }
-
     let militaryHours = date.getHours();
     let localHours = militaryHours;
     let isAM = true;
