@@ -16,7 +16,7 @@ export const useManagerCalendarHooks = () => {
         const riskAssessmentSchedulesResponseObject = { ...responseObject };
         try {
             riskAssessmentSchedules = await loadData(
-                `${BASE_URL}/getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager?id=${id}&activeSchedules=true`,
+                `${BASE_URL}/getRiskAssessmentSchedulesOfSiteMaintenanceAssociatesOfManager?id=${id}`,
                 'GET'
             );
             riskAssessmentSchedulesResponseObject.data = riskAssessmentSchedules;
